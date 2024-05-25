@@ -68,6 +68,8 @@
 </template>
   
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -95,21 +97,33 @@ export default {
     handleFileUpload(event) {
       this.photo = event.target.files[0];
     },
-    handleSave() {
-      // Заменить потом на отправку в БД
-      console.log('Сохранение данных пользователя:', {
-        fullName: this.fullName,
-        birthdate: this.birthdate,
-        hideYear: this.hideYear,
-        workPhone: this.workPhone,
-        personalPhones: this.personalPhones,
-        department: this.department,
-        position: this.position,
-        office: this.office,
-        about: this.about,
-        photo: this.photo
-      });
-      this.$router.push('/profile'); // Добавить id(?)
+    async handleSave() {
+      try {
+        const formData = new FormData();
+        formData.append('email', this.$route.query.email);
+        formData.append('fullName', this.fullName);
+        formData.append('birthdate', this.birthdate);
+        formData.append('hideYear', this.hideYear);
+        formData.append('workPhone', this.workPhone);
+        formData.append('personalPhones', JSON.stringify(this.personalPhones));
+        formData.append('department', this.department);
+        formData.append('position', this.position);
+        formData.append('office', this.office);
+        formData.append('about', this.about);
+        if (this.photo) {
+          formData.append('photo', this.photo);
+        }
+
+        await axios.post('http://localhost:3000/user-info', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        this.$router.push('/profile'); // Добавить id(?)
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 };

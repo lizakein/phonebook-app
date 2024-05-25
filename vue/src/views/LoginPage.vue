@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -55,13 +57,29 @@ export default {
     switchToRegister() {
       this.formMode = 'Зарегестрироваться';
     },
-    handleSubmit() {
+    async handleSubmit() {
       if (this.formMode === 'Войти') {
         console.log('Вход с:', this.email, this.password);
       } else {
         if (this.validateForm()) {
-          console.log('Регистрация с:', this.email, this.password, this.confirmPassword);
-          this.$router.push('/user-info');
+          try {
+            await axios.post('http://localhost:3000/login', { //!
+              email: this.email,
+              password: this.password
+            });
+            this.$router.push({ path: '/user-info', query: { email: this.email }});
+          } catch (error) {
+            if (error.response) {
+              console.error('Response error:', error.response.data); 
+            } else if (error.request) {
+              console.error('Request error:', error.request); 
+            } else {
+              console.error('General error:', error.message);
+            }
+          }   
+        }
+        else {
+          alert('Пароли не совпадают'); // Заменить потом
         }
       }
     },
