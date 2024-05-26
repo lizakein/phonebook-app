@@ -1,10 +1,9 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('phonebook.db', (err) => {
-	if (err) {
+	if (err) 
 	  console.error('Ошибка подключения к базе данных:', err);
-	} else {
-	  console.log('Подключение к базе данных установлено');
-	}
+	 else 
+	  console.log('Подключение к базе данных установлено');	
 });
 
 db.serialize(() => {

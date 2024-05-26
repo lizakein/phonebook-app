@@ -23,15 +23,36 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  const stmt = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
-  stmt.run(email, password, function(err) {
-    if (err) {
-      return res.status(400).send(err);
-    }
-    res.status(201).send({ id: this.lastID });
-  });
-  stmt.finalize();
+  const { action, email, password } = req.body;
+
+  if (action === 'register') {
+    db.get('SELECT email FROM users WHERE email = ?', [email], (err, row) => {
+      if (err) 
+        return res.status(500).send({ message: 'Ошибка сервера' });
+      if (row)
+        return res.status(409).send({ message: 'Этот email уже занят' });
+  
+      const stmt = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
+      stmt.run(email, password, function(err) {
+        if (err) 
+          return res.status(500).send({ message: 'Ошибка сервера' });
+        res.status(201).send({ id: this.lastID });
+      });
+      stmt.finalize();
+    })
+  } else if (action === 'login') {
+    const stmt = db.prepare('SELECT id FROM users WHERE email = ? AND password = ?');
+    stmt.get(email, password, (err, row) => {
+      if (err) 
+        return res.status(500).send({ message: 'Ошибка сервера' });
+      if (!row) 
+        return res.status(401).send({ message: 'Неправильный логин и/или пароль' });   
+      res.status(200).send({ id: row.id });
+    });
+    stmt.finalize();
+  } else {
+    res.status(400).send({ message: 'Некорректное действие' });
+  }
 });
 
 app.post('/user-info', upload.single('photo'), (req, res) => {
@@ -57,10 +78,8 @@ app.post('/user-info', upload.single('photo'), (req, res) => {
   stmt.run(
     fullName, birthdate, hideYear ? 1 : 0, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
     function(err) {
-      if (err) {
-        console.error('Ошибка выполнения запроса:', err);
-        return res.status(400).send(err);
-      }
+      if (err) 
+        return res.status(500).send({ message: 'Ошибка сервера' });
       res.status(200).send({ changes: this.changes });
     }
   );
