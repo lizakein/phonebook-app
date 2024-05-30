@@ -194,7 +194,7 @@ export default {
       if (month < 0 || (month === 0 && today.getDate < birthDate.getDate()))
         age--;
 
-      return age >= 18;
+      return age >= 18 && birthDate.getFullYear() >= 1900;
     },
     validatePhone(phone) {
       const re = /^\+\d{11}$/;
