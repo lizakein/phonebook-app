@@ -3,14 +3,14 @@
     <div class="container">
       <div class="tabs">
         <button 
-          :class="{ 'active': formMode === 'Войти' }" 
+          :class="{ 'active': formMode === 'login' }" 
           class="tabs-button" 
           @click="switchToLogin"
         >
           Войти
         </button>
         <button 
-          :class="{ 'active': formMode === 'Зарегистрироваться' }" 
+          :class="{ 'active': formMode === 'register' }" 
           class="tabs-button" 
           @click="switchToRegister"
         >
@@ -29,12 +29,12 @@
             <input v-model="password" type="password" id="password" required>
             <p v-if="passwordError" class="error-message">{{ passwordError }}</p>
           </div>
-          <div v-if="formMode === 'Зарегистрироваться'" class="form-group">
+          <div v-if="formMode === 'register'" class="form-group">
             <label for="confirmPassword">Подтвердите пароль</label>
             <input v-model="confirmPassword" type="password" id="confirmPassword" required>
             <p v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</p>
           </div>
-          <button type="submit">{{ formMode }}</button>
+          <button type="submit">{{ buttonLabel }}</button>
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </form>
       </div>
@@ -48,7 +48,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      formMode: 'Войти',
+      formMode: 'login',
       email: '',
       password: '',
       confirmPassword: '',
@@ -63,7 +63,7 @@ export default {
       this.emailError = this.validateEmail(value) ? '' : 'Некорректный email';
     },
     password(value) {
-      if (this.formMode === 'Зарегистрироваться') 
+      if (this.formMode === 'register') 
         this.passwordError = this.validatePassword(value) ? '' : 'Пароль должен быть не менее 8 символов, содержать буквы, цифры и спецсимволы';
       else 
         this.passwordError = '';
@@ -72,14 +72,19 @@ export default {
       this.confirmPasswordError = value === this.password ? '' : 'Пароли не совпадают';
     }
   },
+  computed: {
+    buttonLabel() {
+      return this.formMode === 'login' ? 'Войти' : "Зарегистрироваться";
+    }
+  },
   methods: {
     switchToLogin() {
-      this.formMode = 'Войти';
+      this.formMode = 'login';
       this.errorMessage = '';
       this.clearErrors();
     },
     switchToRegister() {
-      this.formMode = 'Зарегистрироваться';
+      this.formMode = 'register';
       this.errorMessage = '';
       this.clearErrors();
     },
@@ -91,12 +96,12 @@ export default {
     async handleSubmit() {
       this.errorMessage = '';
 
-      if (this.formMode === 'Зарегистрироваться' && !this.validateForm()) 
+      if (this.formMode === 'register' && !this.validateForm()) 
         return;
 
       try {
         let response;
-        if(this.formMode === 'Войти') {
+        if(this.formMode === 'login') {
           response = await axios.post('http://localhost:3000/login', {
             email: this.email,
             password: this.password
@@ -112,7 +117,7 @@ export default {
         const token = response.data.token;
         localStorage.setItem('token', token);  
         
-        if (this.formMode === 'Войти') 
+        if (this.formMode === 'login') 
           this.$router.push({ path: `/profile/${response.data.id}`});
         else 
           this.$router.push({ path: '/user-info', query: { email: this.email }});       
