@@ -95,11 +95,22 @@ export default {
         return;
 
       try {
-        const response = await axios.post('http://localhost:3000/login', {
-          action: this.formMode === 'Войти' ? 'login' : 'register',
-          email: this.email,
-          password: this.password
-        });
+        let response;
+        if(this.formMode === 'Войти') {
+          response = await axios.post('http://localhost:3000/login', {
+            email: this.email,
+            password: this.password
+          });
+        } else {
+          response = await axios.post('http://localhost:3000/register', {
+            email: this.email,
+            password: this.password,
+            confirmPassword: this.confirmPassword
+          });
+        }
+
+        const token = response.data.token;
+        localStorage.setItem('token', token);  
         
         if (this.formMode === 'Войти') 
           this.$router.push({ path: `/profile/${response.data.id}`});

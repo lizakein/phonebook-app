@@ -71,6 +71,7 @@
           <input type="file" id="photo" @change="handleFileUpload">
         </div>
         <button type="submit">Сохранить данные</button>
+        <p v-if="erorrMessage" class="error-message">{{ erorrMessage }}</p>
       </form>
     </div>
   </div>
@@ -98,7 +99,8 @@ export default {
       birthdateError: '',
       workPhoneError: '',
       departmentError: '',
-      positionError: ''
+      positionError: '',
+      erorrMessage: ''
     };
   },
   watch: {
@@ -130,8 +132,10 @@ export default {
     },
     async handleSave() {
       try {
-        if (!this.validateForm())
+        if (!this.validateForm()) {
+          this.erorrMessage = 'Введены некорректные данные';
           return;
+        }
 
         // Убираем все поля без телефонов перед сохранение в БД
         const filteredPhones = this.personalPhones
@@ -153,15 +157,22 @@ export default {
           formData.append('photo', this.photo);
         }
 
-        await axios.post('http://localhost:3000/user-info', formData, {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          this.erorrMessage = 'Не удалось получить токен авторизации';
+          return;
+        }
+
+        const response = await axios.post('http://localhost:3000/user-info', formData, {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
           }
         });
 
-        this.$router.push('/profile'); // Добавить id(?)
-      } catch (e) {
-        console.error(e);
+        if (response.status === 200) this.$router.push('/profile'); // Добавить id(?)
+      } catch (error) {
+        this.erorrMessage = 'Ошибка сервера';
       }
     },
     validateForm() {
