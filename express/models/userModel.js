@@ -28,18 +28,25 @@ const updateUserInfo = (email, userData, callback) => {
 		photo
   } = userData;
 
-  const stmt = db.prepare(`
-    UPDATE users
-    SET fullName = ?, birthdate = ?, hideYear = ?, workPhone = ?, personalPhones = ?, department = ?, position = ?, office = ?, about = ?, photo = ?
-    WHERE email = ?
-  `);
-  stmt.run(
-    fullName, birthdate, hideYear ? 1 : 0, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
-    function(err) {
-      callback(err, this.changes);
-    }
-  );
-  stmt.finalize();
+  db.get('SELECT id FROM users WHERE email = ?', [email], (err, row) => {
+    if (err || !row) 
+      return callback(err || new Error('Пользователь не найден'));
+
+    const userId = row.id;
+
+    const stmt = db.prepare(`
+      UPDATE users
+      SET fullName = ?, birthdate = ?, hideYear = ?, workPhone = ?, personalPhones = ?, department = ?, position = ?, office = ?, about = ?, photo = ?
+      WHERE email = ?
+    `);
+    stmt.run(
+      fullName, birthdate, hideYear ? 1 : 0, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
+      function(err) {
+        callback(err, { id: userId });
+      }
+    );
+    stmt.finalize();
+  });
 };
 
 module.exports = {

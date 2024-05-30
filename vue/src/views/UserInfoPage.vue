@@ -170,7 +170,7 @@ export default {
           }
         });
 
-        if (response.status === 200) this.$router.push('/profile'); // Добавить id(?)
+        if (response.status === 200) this.$router.push(`/profile/${response.data.id}`);       
       } catch (error) {
         this.erorrMessage = 'Ошибка сервера';
       }

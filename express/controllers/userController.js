@@ -28,10 +28,10 @@ const updateUserInfo = (req, res) => {
     photo
   };
 
-  userModel.updateUserInfo(email, userData, (err, changes) => {
+  userModel.updateUserInfo(email, userData, (err, userId) => {
     if (err)
       return res.status(500).send({ message: 'Ошибка сервера '});
-    res.status(200).send({ changes });
+    res.status(200).send({ id: userId.id });
   });
 };
 
