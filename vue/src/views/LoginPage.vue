@@ -102,12 +102,12 @@ export default {
       try {
         let response;
         if(this.formMode === 'login') {
-          response = await axios.post('http://localhost:3000/login', {
+          response = await axios.post('http://localhost:3000/auth/login', {
             email: this.email,
             password: this.password
           });
         } else {
-          response = await axios.post('http://localhost:3000/register', {
+          response = await axios.post('http://localhost:3000/auth/register', {
             email: this.email,
             password: this.password,
             confirmPassword: this.confirmPassword
@@ -127,7 +127,7 @@ export default {
         else if (error.response && error.response.status === 401)
           this.errorMessage = 'Неправильный логин и/или пароль';
         else
-          this.errorMessage = 'Ошибка сервера ';
+          this.errorMessage = 'Ошибка сервера';
       }
     },
     validateForm() {

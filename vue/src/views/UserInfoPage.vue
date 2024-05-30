@@ -163,7 +163,7 @@ export default {
           return;
         }
 
-        const response = await axios.post('http://localhost:3000/user-info', formData, {
+        const response = await axios.post('http://localhost:3000/user/user-info', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`
