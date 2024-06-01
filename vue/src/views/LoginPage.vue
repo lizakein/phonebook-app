@@ -18,25 +18,10 @@
         </button>
       </div>
       <div class="form">
-        <form @submit.prevent="handleSubmit">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input v-model="email" type="email" id="email" required>
-            <p v-if="emailError" class="error-message">{{ emailError }}</p>
-          </div>
-          <div class="form-group">
-            <label for="password">Пароль</label>
-            <input v-model="password" type="password" id="password" required>
-            <p v-if="passwordError" class="error-message">{{ passwordError }}</p>
-          </div>
-          <div v-if="formMode === 'register'" class="form-group">
-            <label for="confirmPassword">Подтвердите пароль</label>
-            <input v-model="confirmPassword" type="password" id="confirmPassword" required>
-            <p v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</p>
-          </div>
-          <button type="submit">{{ buttonLabel }}</button>
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        </form>
+        <EmailPasswordForm
+          :formMode="formMode"
+          @submit="handleFormSubmit"
+        />
       </div>
     </div>
   </div>
@@ -44,33 +29,17 @@
 
 <script>
 import axios from 'axios';
+import EmailPasswordForm from '@/components/EmailPasswordForm.vue';
 
 export default {
+  name: 'LoginPage',
+  components: {
+    EmailPasswordForm
+  },
   data() {
     return {
       formMode: 'login',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      emailError: '',
-      passwordError: '',
-      confirmPasswordError: '',
-      errorMessage: ''
     };
-  },
-  watch: {
-    email(value) {
-      this.emailError = this.validateEmail(value) ? '' : 'Некорректный email';
-    },
-    password(value) {
-      if (this.formMode === 'register') 
-        this.passwordError = this.validatePassword(value) ? '' : 'Пароль должен быть не менее 8 символов, содержать буквы, цифры и спецсимволы';
-      else 
-        this.passwordError = '';
-    },
-    confirmPassword(value) {
-      this.confirmPasswordError = value === this.password ? '' : 'Пароли не совпадают';
-    }
   },
   computed: {
     buttonLabel() {
@@ -80,37 +49,28 @@ export default {
   methods: {
     switchToLogin() {
       this.formMode = 'login';
-      this.errorMessage = '';
-      this.clearErrors();
     },
     switchToRegister() {
       this.formMode = 'register';
-      this.errorMessage = '';
-      this.clearErrors();
     },
     clearErrors() {
       this.emailError = '';
       this.passwordError = '';
       this.confirmPasswordError = '';
     },
-    async handleSubmit() {
-      this.errorMessage = '';
-
-      if (this.formMode === 'register' && !this.validateForm()) 
-        return;
-
+    async handleFormSubmit({ email, password, confirmPassword }) {
       try {
         let response;
         if(this.formMode === 'login') {
           response = await axios.post('http://localhost:3000/auth/login', {
-            email: this.email,
-            password: this.password
+            email,
+            password
           });
         } else {
           response = await axios.post('http://localhost:3000/auth/register', {
-            email: this.email,
-            password: this.password,
-            confirmPassword: this.confirmPassword
+            email,
+            password,
+            confirmPassword
           });
         }
 
@@ -120,7 +80,7 @@ export default {
         if (this.formMode === 'login') 
           this.$router.push({ path: `/profile/${response.data.id}`});
         else 
-          this.$router.push({ path: '/user-info', query: { email: this.email }});       
+          this.$router.push({ path: '/user-info', query: { email }});       
       } catch (error) {
         if (error.response && error.response.status === 409) 
           this.errorMessage = 'Этот email уже занят';
@@ -129,18 +89,6 @@ export default {
         else
           this.errorMessage = 'Ошибка сервера';
       }
-    },
-    validateForm() {
-      const doPasswordMatch = this.password === this.confirmPassword;
-      return this.validateEmail(this.email) && this.validatePassword(this.password) && doPasswordMatch;
-    },
-    validateEmail(email) {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(String(email).toLowerCase());
-    },
-    validatePassword(password) {
-      const re = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&_.-])[A-Za-z\d@$!%*#?&_.-]{8,}$/;
-      return re.test(password);
     }
   }
 };
@@ -163,10 +111,5 @@ export default {
   display: flex;
   justify-content: space-between;
   padding-bottom: 20px;
-}
-
-.error-message {
-  color: red;
-  margin-top: 10px;
 }
 </style>
