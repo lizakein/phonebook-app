@@ -13,12 +13,14 @@ const updateUserInfo = (req, res) => {
     office,
     about
   } = req.body;
-  const photo = req.file ? req.file.path : '';
+  const photo = req.file ? req.file.path : 'uploads/default-photo.jpg';
+
+  const hideYearBool = hideYear === 'true';
 
   const userData = {
     fullName,
     birthdate,
-    hideYear: hideYear ? 1 : 0, 
+    hideYear: hideYearBool ? 1 : 0, 
     workPhone,
     personalPhones,
     department,
@@ -35,6 +37,17 @@ const updateUserInfo = (req, res) => {
   });
 };
 
+const getUserById = (req, res) => {
+  const userId = req.params.id;
+  userModel.getUserById(userId, (err, user) => {
+    if (err || !user) {
+      return res.status(404).send({ message: 'Пользователь не найден'});
+    }
+    res.status(200).send(user);
+  });
+};
+
 module.exports = {
-  updateUserInfo
+  updateUserInfo,
+  getUserById
 };

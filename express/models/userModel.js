@@ -14,6 +14,12 @@ const getUserByEmail = (email, callback) => {
 	});
 };
 
+const getUserById = (id, callback) => {
+  db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+    callback(err, row);
+  });
+};
+
 const updateUserInfo = (email, userData, callback) => {
   const {
     fullName,
@@ -40,7 +46,7 @@ const updateUserInfo = (email, userData, callback) => {
       WHERE email = ?
     `);
     stmt.run(
-      fullName, birthdate, hideYear ? 1 : 0, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
+      fullName, birthdate, hideYear, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
       function(err) {
         callback(err, { id: userId });
       }
@@ -52,5 +58,6 @@ const updateUserInfo = (email, userData, callback) => {
 module.exports = {
 	createUser,
 	getUserByEmail,
+  getUserById,
 	updateUserInfo
 };
