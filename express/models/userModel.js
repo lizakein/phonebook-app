@@ -20,6 +20,22 @@ const getUserById = (id, callback) => {
   });
 };
 
+const updateEmail = (id, newEmail, callback) => {
+  const stmt = db.prepare('UPDATE users SET email = ? WHERE id = ?');
+  stmt.run(newEmail, id, (err) => {
+    callback(err);
+  });
+  stmt.finalize();
+};
+
+const updatePassword = (id, newPassword, callback) => {
+  const stmt = db.prepare('UPDATE users SET password = ? WHERE id = ?');
+  stmt.run(newPassword, id, (err) => {
+    callback(err);
+  });
+  stmt.finalize();
+};
+
 const updateUserInfo = (email, userData, callback) => {
   const {
     fullName,
@@ -59,5 +75,7 @@ module.exports = {
 	createUser,
 	getUserByEmail,
   getUserById,
-	updateUserInfo
+	updateUserInfo,
+  updateEmail,
+  updatePassword
 };

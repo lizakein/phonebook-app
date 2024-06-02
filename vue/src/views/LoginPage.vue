@@ -22,6 +22,7 @@
           :formMode="formMode"
           @submit="handleFormSubmit"
         />
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </div>
     </div>
   </div>
@@ -39,6 +40,7 @@ export default {
   data() {
     return {
       formMode: 'login',
+      errorMessage: ''
     };
   },
   computed: {
@@ -49,14 +51,11 @@ export default {
   methods: {
     switchToLogin() {
       this.formMode = 'login';
+      this.errorMessage = '';
     },
     switchToRegister() {
       this.formMode = 'register';
-    },
-    clearErrors() {
-      this.emailError = '';
-      this.passwordError = '';
-      this.confirmPasswordError = '';
+      this.errorMessage = '';
     },
     async handleFormSubmit({ email, password, confirmPassword }) {
       try {
@@ -82,9 +81,9 @@ export default {
         else 
           this.$router.push({ path: '/user-info', query: { email }});       
       } catch (error) {
-        if (error.response && error.response.status === 409) 
+        if (error.response.status === 409) 
           this.errorMessage = 'Этот email уже занят';
-        else if (error.response && error.response.status === 401)
+        else if (error.response.status === 401)
           this.errorMessage = 'Неправильный логин и/или пароль';
         else
           this.errorMessage = 'Ошибка сервера';
@@ -105,11 +104,5 @@ export default {
 
 .container {
   width: 400px;
-}
-
-.tabs {
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: 20px;
 }
 </style>

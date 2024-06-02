@@ -76,7 +76,7 @@
 
 <script>
 export default {
-  name: 'UserForm',
+  name: 'UserDataForm',
   props: {
     userData: {
       type: Object,

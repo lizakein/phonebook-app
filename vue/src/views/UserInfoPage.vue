@@ -2,7 +2,7 @@
   <div class="user-info-page">
     <div class="container">
       <h2 class="heading">Введите личные данные</h2>
-      <UserForm 
+      <UserDataForm 
         :userData="user" 
         @save="handleSave"
       />
@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import UserForm from '@/components/UserForm.vue';
+import UserDataForm from '@/components/UserDataForm.vue';
 import axios from 'axios';
 
 export default {
   components: {
-    UserForm
+    UserDataForm
   },
   data() {
     return {
