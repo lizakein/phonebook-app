@@ -2,7 +2,7 @@
   <div class="user-profile">
     <div class="photo-section">
       <img v-if="user.photo" :src="getPhotoUrl(user.photo)" alt="Фото пользователя">
-      <button class="button">Редактировать профиль</button>
+      <button class="button" @click="editProfile">Редактировать профиль</button>
     </div>
     <div class="info-section">
       <div class="full-name"> {{ user.fullName }}</div>
@@ -54,7 +54,7 @@ export default {
         let personalPhones = [];
 
         try {
-          personalPhones = JSON.parse(JSON.parse(this.user.personalPhones));
+          personalPhones = JSON.parse(this.user.personalPhones);
           if (!Array.isArray(personalPhones))
             throw new Error("Парсированный personalPhones не является массивом");
         } catch (error) {
@@ -80,6 +80,9 @@ export default {
         { name: 'workplace', label: 'Рабочее место', value: this.user.office || '—' },
         { name: 'about', label: 'О себе', value: this.user.about || '—' }
       );
+    },
+    editProfile() {
+      this.$router.push(`/profile/${this.user.id}/edit`);
     }
   },
   created() {

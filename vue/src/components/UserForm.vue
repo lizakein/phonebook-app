@@ -1,5 +1,5 @@
 <template>
-  <div class="user-form">
+  <div v-if="user" class="user-form">
     <form @submit.prevent="handleSave">
       <p class="hint">* – обязательное поле</p>
       <div class="form-group">
@@ -85,9 +85,7 @@ export default {
         birthdate: '',
         hideYear: false,
         workPhone: '',
-        personalPhones: [
-          { number: '', hide: false, error: '' }
-        ],
+        personalPhones: [{ number: '', hide: false, error: '' }],
         department: '',
         position: '',
         office: '',
@@ -98,7 +96,7 @@ export default {
   },
   data() {
     return {
-      user: { ...this.userData },
+      user: null,
       fullNameError: '',
       birthdateError: '',
       workPhoneError: '',
@@ -108,6 +106,15 @@ export default {
     };
   },
   watch: {
+    userData: {
+      immediate: true,
+      handler(newValue) {
+        this.user = { ...newValue };
+        if (!this.user.personalPhones || !this.user.personalPhones.length)
+          this.user.personalPhones = [{ number: '', hide: false, error: '' }];
+      },
+      deep: true
+    },
     'user.fullName': function (value) {
       this.fullNameError = this.validateText(value) ? '' : (value ? 'Некорректное ФИО' : 'Поле обязательное');
     },
