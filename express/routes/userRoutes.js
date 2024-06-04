@@ -1,5 +1,5 @@
 const express = require('express');
-const { updateUserInfo, getUserById, updateEmail, updatePassword, getUserByEmail } = require('../controllers/userController');
+const { updateUserInfo, getUserById, updateEmail, updatePassword } = require('../controllers/userController');
 const upload = require('../config/uploadConfig');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
