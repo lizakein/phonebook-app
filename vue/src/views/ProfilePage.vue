@@ -1,6 +1,8 @@
 <template>
-  <div class="page-container container">
-    <UserProfile :userData="user" v-if="user"/>
+  <div class="page-container">
+    <div class="container">
+      <UserProfile :userData="user" v-if="user"/>
+    </div>
   </div>
 </template>
   
@@ -40,6 +42,8 @@ export default {
 
 <style>
 .page-container {
+  display: flex;
+  justify-content: center;
   margin: 5% 15%;
 }
 </style>

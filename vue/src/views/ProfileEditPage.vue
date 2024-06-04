@@ -139,7 +139,7 @@ export default {
         let userData = response.data;
         // Проверяем и парсим JSON строку для personalPhones
         if (typeof userData.personalPhones === 'string') 
-          userData.personalPhones = JSON.parse(JSON.parse(userData.personalPhones));       
+          userData.personalPhones = JSON.parse(userData.personalPhones);       
 
         this.user = response.data;
       } catch (error) {
