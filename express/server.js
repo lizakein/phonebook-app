@@ -1,13 +1,22 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// Обработчик маршрута для главной страницы
-app.get('/', (req, res) => {
-  res.send('Привет, мир!');
-});
+app.use(bodyParser.json());
+app.use(cors());
 
-// Начало прослушивания сервера на указанном порту
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+
+app.use('/auth', authRoutes);
+app.use('/user', userRoutes);
+
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 });
