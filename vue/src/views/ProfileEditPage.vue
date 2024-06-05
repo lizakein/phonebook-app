@@ -60,32 +60,34 @@ export default {
       this.formMode = 'info';
       this.errorMessage = '';
     },
-    handleSave() {
-      this.saveUserData();
+    handleSave(userDataToUpdate) {
+      this.saveUserData(userDataToUpdate);
     },
     handleSaveSettings(data) {
       this.saveUserSettings(data);
     },
-    async saveUserData() {
-      const filteredPhones = this.user.personalPhones
+    async saveUserData(userDataToUpdate) {
+      const filteredPhones = userDataToUpdate.personalPhones
         .filter(phone => phone.number.trim() !== '')
         .map(phone => ({ number: phone.number, hide: phone.hide }));
       
-      const userDataToSave = {
-        ...this.user,
+      const userData = {
+        ...userDataToUpdate,
         personalPhones: filteredPhones
       };
 
       try {       
-        const response = await axios.post('http://localhost:3000/user/user-info', userDataToSave, {
+        const response = await axios.post('http://localhost:3000/user/user-info', userData, {
           headers: {
             'Authorization': `Bearer ${this.token}`,
             'Content-Type': 'application/json'
           }
         });
 
-        if (response.status === 200)
+        if (response.status === 200) {
+          this.user = { ...userData };
           this.$router.push(`/profile/${this.user.id}`);
+        }
       } catch (error) {
         console.log(error);
         this.errorMessage = 'Ошибка сервера';
@@ -138,8 +140,11 @@ export default {
 
         let userData = response.data;
         // Проверяем и парсим JSON строку для personalPhones
-        if (typeof userData.personalPhones === 'string') 
-          userData.personalPhones = JSON.parse(userData.personalPhones);       
+        if (typeof userData.personalPhones === 'string') {
+          userData.personalPhones = JSON.parse(userData.personalPhones);  
+          if (!Array.isArray(userData.personalPhones)) 
+            userData.personalPhones = JSON.parse(userData.personalPhones)
+        }     
 
         this.user = response.data;
       } catch (error) {

@@ -86,11 +86,13 @@ const updateUserInfo = (req, res) => {
 
 const getUserById = (req, res) => {
   const userId = req.params.id;
+  const currentUserId = req.user.id;
+
   userModel.getUserById(userId, (err, user) => {
-    if (err || !user) {
+    if (err || !user) 
       return res.status(404).send({ message: 'Пользователь не найден'});
-    }
-    res.status(200).send(user);
+    const isOwner = userId == currentUserId;
+    res.status(200).send( {...user, isOwner});
   });
 };
 

@@ -2,7 +2,20 @@
   <div class="user-profile">
     <div class="photo-section">
       <img v-if="user.photo" :src="getPhotoUrl(user.photo)" alt="Фото пользователя">
-      <button class="button" @click="editProfile">Редактировать профиль</button>
+      <button 
+        v-if="isOwner" 
+        class="button" 
+        @click="editProfile"
+      >
+        Редактировать профиль
+      </button>
+      <button 
+        v-if="!isOwner && hasHiddenPhone" 
+        class="button" 
+        @click="requestAccess"
+      >
+        Запросить доступ к личному номеру
+      </button>
     </div>
     <div class="info-section">
       <div class="full-name"> {{ user.fullName }}</div>
@@ -11,7 +24,7 @@
         <div class="info-value">
           <span>{{ field.value }}</span>        
         </div>
-      </div>
+      </div>  
     </div>
   </div>
 </template>
@@ -24,12 +37,19 @@ export default {
     userData: {
       type: Object,
       required: true
+    },
+    isOwner: {
+      type: Boolean,
+      required: true,
+      default: false
     }
   },
   data() {
     return {
       user: { ...this.userData },
-      fields: []
+      fields: [],
+      personalPhones: [],
+      hasHiddenPhone: false
     };
   },
   methods: {
@@ -44,10 +64,14 @@ export default {
       return this.user.hideYear ? `${day}.${month}` : `${day}.${month}.${year}`;
     },
     populateFields() {
-      this.fields = [
+      const baseFields = [
         { name: 'email', label: 'Email', value: this.user.email || '—' },
         { name: 'birthDate', label: 'Дата рождения', value: this.formatDate(this.user.birthdate) || '—' },
-        { name: 'workPhone', label: 'Рабочий телефон', value: this.user.workPhone || '—' }
+        { name: 'workPhone', label: 'Рабочий телефон', value: this.user.workPhone || '—' },
+        { name: 'department', label: 'Отдел', value: this.user.department || '—' },
+        { name: 'position', label: 'Должность', value: this.user.position || '—' },
+        { name: 'workplace', label: 'Рабочее место', value: this.user.office || '—' },
+        { name: 'about', label: 'О себе', value: this.user.about || '—' }
       ];
 
       if (this.user.personalPhones !== '"[]"') {
@@ -55,34 +79,45 @@ export default {
 
         try {
           personalPhones = JSON.parse(this.user.personalPhones);
-          if (!Array.isArray(personalPhones))
-            throw new Error("Парсированный personalPhones не является массивом");
+          if (!Array.isArray(personalPhones)) 
+            personalPhones = JSON.parse(personalPhones)
         } catch (error) {
           console.error("Ошибка парсинга данных", error);
           personalPhones = [];          
         }
 
-        personalPhones.forEach((phone, index) => {
-          const phoneValue = phone.hide ? `${phone.number} (скрыто)` : phone.number;
-          this.fields.push({
-            name: `personalPhone${index}`,
-            label: `Личный телефон №${index + 1}`,
-            value: phoneValue
-          });
-        });       
-      } else {
-        this.fields.push({ name: 'personalPhone', label: 'Личный телефон', value: '—'});
-      }
+        personalPhones.forEach(phone => {
+          if (phone.hide && !this.isOwner) this.hasHiddenPhone = true;
+          else this.personalPhones.push({ number: phone.number });
+        });
 
-      this.fields.push(
-        { name: 'department', label: 'Отдел', value: this.user.department || '—' },
-        { name: 'position', label: 'Должность', value: this.user.position || '—' },
-        { name: 'workplace', label: 'Рабочее место', value: this.user.office || '—' },
-        { name: 'about', label: 'О себе', value: this.user.about || '—' }
-      );
+        if (this.personalPhones.length > 0) {
+          baseFields.splice(3, 0, {
+            name: 'personalPhones',
+            label: 'Личный телефон',
+            value: this.personalPhones.map(phone => phone.number).join(', ')
+          });
+        } else {
+          baseFields.splice(3, 0, {
+            name: 'personalPhones',
+            label: 'Личный телефон',
+            value: '—'
+          });
+        }
+      } else {
+        baseFields.splice(3, 0, {
+          name: 'personalPhones',
+          label: 'Личный телефон',
+          value: '—'
+        });
+      }
+      this.fields = baseFields;
     },
     editProfile() {
       this.$router.push(`/profile/${this.user.id}/edit`);
+    },
+    requestAccess() {
+      // Запрос на доступ к скрытому номеру
     }
   },
   created() {
