@@ -109,7 +109,7 @@ export default {
     userData: {
       immediate: true,
       handler(newValue) {
-        this.user = { ...newValue };
+        this.user = JSON.parse(JSON.stringify(newValue));
         if (!this.user.personalPhones || !this.user.personalPhones.length)
           this.user.personalPhones = [{ number: '', hide: false, error: '' }];
       },
