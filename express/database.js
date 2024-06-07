@@ -1,9 +1,17 @@
 const sqlite3 = require('sqlite3').verbose();
+
 const db = new sqlite3.Database('phonebook.db', (err) => {
 	if (err) 
-	  console.error('Ошибка подключения к базе данных:', err);
+	  console.error('Ошибка подключения к базе данных телефонной книги:', err);
 	 else 
-	  console.log('Подключение к базе данных установлено');	
+	  console.log('Подключение к базе данных телефонной книги установлено');	
+});
+
+const db_requests = new sqlite3.Database('access_requests.db', (err) => {
+	if (err) 
+		console.error('Ошибка подключения к базе данных запросов:', err);
+	else 
+		console.log('Подключение к базе данных запросов установлено');	
 });
 
 db.serialize(() => {
@@ -26,4 +34,18 @@ db.serialize(() => {
 	`);
 });
 
-module.exports = db; 
+db_requests.serialize(() => {
+	db_requests.run(`
+		CREATE TABLE IF NOT EXISTS access_requests (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			requester_id INTEGER,
+			owner_id INTEGER,
+			status TEXT DEFAULT 'pending'
+		)
+	`);
+});
+
+module.exports = {
+	db,
+	db_requests
+};

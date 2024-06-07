@@ -10,7 +10,7 @@
         Редактировать профиль
       </button>
       <button 
-        v-if="!isOwner && hasHiddenPhone" 
+        v-if="!isOwner && hasHiddenPhone && !requestExists" 
         class="button" 
         @click="requestAccess"
       >
@@ -30,7 +30,9 @@
 </template>
   
 <script>
+import axios from 'axios';
 import { String } from 'core-js';
+import { jwtDecode } from 'jwt-decode';
 
 export default {
   props: {
@@ -49,7 +51,9 @@ export default {
       user: { ...this.userData },
       fields: [],
       personalPhones: [],
-      hasHiddenPhone: false
+      hasHiddenPhone: false,
+      requestExists: false,
+      currentUserId: null
     };
   },
   methods: {
@@ -64,6 +68,8 @@ export default {
       return this.user.hideYear ? `${day}.${month}` : `${day}.${month}.${year}`;
     },
     populateFields() {
+      this.personalPhones = [];
+      
       const baseFields = [
         { name: 'email', label: 'Email', value: this.user.email || '—' },
         { name: 'birthDate', label: 'Дата рождения', value: this.formatDate(this.user.birthdate) || '—' },
@@ -116,12 +122,55 @@ export default {
     editProfile() {
       this.$router.push(`/profile/${this.user.id}/edit`);
     },
-    requestAccess() {
-      // Запрос на доступ к скрытому номеру
+    async requestAccess() {
+      try {
+        await axios.post('http://localhost:3000/access/access-request', { ownerId: this.user.id }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        alert('Запрос на доступ к личному номеру отправлен');
+        this.requestExists = true;
+      } catch(error) {
+        console.error('Ошибка запроса на доступ', error);
+        alert('Не удалось отправить запрос на доступ');
+      }
+    },
+    async checkAccessRequest() {
+      if (this.currentUserId !== this.user.id && this.hasHiddenPhone) {
+        try {
+        const response = await axios.get(`http://localhost:3000/access/access-request/check/${this.currentUserId}/${this.user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        this.requestExists = response.data.exists;
+      } catch (error) {
+        console.error('Ошибка при проверке существующего запроса', error);
+        this.requestExists = false;
+      }
+      } else {
+        this.requestExists = true;
+      }    
     }
   },
-  created() {
-    this.populateFields();
+  async mounted() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      this.currentUserId = decodedToken.id;
+    }
+    await this.populateFields();
+    await this.checkAccessRequest();
+  },
+  watch: {
+    userData: {
+      immediate: true,
+      handler(newValue) {
+        this.user = { ...newValue };
+        this.populateFields();
+      }
+    }
   }
 };
 </script>

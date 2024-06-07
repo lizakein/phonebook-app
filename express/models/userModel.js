@@ -1,4 +1,4 @@
-const db = require('../database');
+const { db } = require('../database');
 
 const createUser = (email, hashedPassword, callback) => {
 	const stmt = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
