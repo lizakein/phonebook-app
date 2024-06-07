@@ -47,13 +47,17 @@ export default {
     }
   },
   data() {
+    const token = localStorage.getItem('token');
+    const decodedToken = token ? jwtDecode(token) : null;
+    const currentUserId = decodedToken ? decodedToken.id : null;
+
     return {
       user: { ...this.userData },
       fields: [],
       personalPhones: [],
       hasHiddenPhone: false,
       requestExists: false,
-      currentUserId: null
+      currentUserId: currentUserId
     };
   },
   methods: {
@@ -67,7 +71,7 @@ export default {
       const year = date.getFullYear();
       return this.user.hideYear ? `${day}.${month}` : `${day}.${month}.${year}`;
     },
-    populateFields() {
+    async populateFields() {
       this.personalPhones = [];
       
       const baseFields = [
@@ -89,12 +93,33 @@ export default {
             personalPhones = JSON.parse(personalPhones)
         } catch (error) {
           console.error("Ошибка парсинга данных", error);
-          personalPhones = [];          
+          personalPhones = [];
+        }
+
+        let accessGranted = false;
+        if (!this.isOwner) {
+          try {
+            const response = await axios.get(`http://localhost:3000/access/access-request/status/${this.currentUserId}/${this.user.id}`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              }
+            });
+
+            accessGranted = response.data.status === 'accepted';
+          } catch (error) {
+            if (error.response && error.response.status === 404)
+              accessGranted = false;
+            else
+              console.error('Ошибка при проверке существующего запроса', error)
+          }
         }
 
         personalPhones.forEach(phone => {
-          if (phone.hide && !this.isOwner) this.hasHiddenPhone = true;
-          else this.personalPhones.push({ number: phone.number });
+          if (phone.hide && !this.isOwner && !accessGranted) 
+            this.hasHiddenPhone = true;
+          else 
+            if (!this.personalPhones.some(item => item.number === phone.number))
+              this.personalPhones.push({ number: phone.number });
         });
 
         if (this.personalPhones.length > 0) {
@@ -129,6 +154,7 @@ export default {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+
         alert('Запрос на доступ к личному номеру отправлен');
         this.requestExists = true;
       } catch(error) {
@@ -144,22 +170,22 @@ export default {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+
         this.requestExists = response.data.exists;
-      } catch (error) {
-        console.error('Ошибка при проверке существующего запроса', error);
-        this.requestExists = false;
-      }
+        } catch (error) {
+          if (error.response && error.response.status === 404)
+            this.requestExists = false;
+          else {
+            console.error('Ошибка при проверке существующего запроса', error);
+            this.requestExists = false;
+          }
+        }
       } else {
         this.requestExists = true;
-      }    
+      }
     }
   },
   async mounted() {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      this.currentUserId = decodedToken.id;
-    }
     await this.populateFields();
     await this.checkAccessRequest();
   },

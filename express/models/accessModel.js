@@ -42,9 +42,19 @@ const checkAccessRequest = (requesterId, ownerId, callback) => {
   });
 };
 
+const checkAccessRequestStatus = (requesterId, ownerId, callback) => {
+  db_requests.get('SELECT status FROM access_requests WHERE requester_id = ? AND owner_id = ?', [requesterId, ownerId], (err, row) => {
+    if (err) return callback(err, null);
+    
+    if (row) return callback(null, row.status);
+    else return callback(null, null); 
+  });
+};
+
 module.exports = {
   createAccessRequest,
   getAccessRequestsByUserId,
   updateAccessRequestStatus,
-  checkAccessRequest
+  checkAccessRequest,
+  checkAccessRequestStatus
 };

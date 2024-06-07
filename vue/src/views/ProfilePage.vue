@@ -13,8 +13,21 @@
           <p v-else>На текущий момент нет запросов</p>
         </div>
         <div v-else>
-          <div v-for="request in requests" :key="request.id">
-            <router-link :to="'/profile/' + request.requester_id">{{ request.fullName }}</router-link>
+          <div v-for="request in pendingRequests" :key="request.id" class="request-item">
+            <router-link 
+              :to="'/profile/' + request.requester_id" 
+              class="request-link"
+            >
+              {{ request.fullName }}
+            </router-link>
+            <div class="request-buttons">
+              <button class="button-accept" @click="acceptRequest(request)">
+                Принять
+              </button>
+              <button class="button-reject" @click="rejectRequest(request)">
+                Отклонить
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -39,6 +52,11 @@ export default {
       requests: [],
       hasHiddenPhone: false
     };
+  },
+  computed: {
+    pendingRequests() {
+      return this.requests.filter(request => request.status === 'pending');
+    }
   },
   methods: {
     async fetchUserData() {
@@ -77,7 +95,7 @@ export default {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        this.requests = response.data.requests;
+        this.requests = response.data.requests.filter(request => request.status === 'pending');
       } catch (error) {
         console.error('Ошибка получения запросов на доступ', error);
       }
@@ -93,9 +111,32 @@ export default {
         console.error('Ошибка проверки скрытых номеров', error);
       }
     },
-    handleAccessRequest(request) {
-      // обработка отклонения и принятия запроса
-    }
+    async acceptRequest(request) {
+      try {
+        await axios.put(`http://localhost:3000/access/access-request/${request.id}`, { status: 'accepted' }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        this.fetchAccessRequests();
+      } catch (error) {
+        console.error('Ошибка при принятии запроса', error);
+      }
+    },
+    async rejectRequest(request) {
+      try {
+        await axios.put(`http://localhost:3000/access/access-request/${request.id}`, { status: 'rejected' }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        this.fetchAccessRequests();
+      } catch (error) {
+        console.error('Ошибка при отклонении запроса', error);
+      }
+    }  
   },
   created() {
     this.fetchCurrentUser();
@@ -109,5 +150,24 @@ export default {
   display: flex;
   justify-content: center;
   margin: 5% 15%;
+}
+
+.request-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.request-buttons {
+  display: flex;
+}
+
+.request-buttons button {
+  margin-left: 10px;
+}
+
+.button-reject {
+  background-color: grey;
 }
 </style>
