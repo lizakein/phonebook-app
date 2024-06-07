@@ -35,6 +35,7 @@ import { String } from 'core-js';
 import { jwtDecode } from 'jwt-decode';
 
 export default {
+  name: 'UserProfile',
   props: {
     userData: {
       type: Object,

@@ -5,6 +5,7 @@ import LoginPage from '@/views/LoginPage.vue'
 import UserInfoPage from '@/views/UserInfoPage.vue'
 import ProfilePage from '@/views/ProfilePage.vue'
 import ProfileEditPage from '@/views/ProfileEditPage.vue'
+import UserListPage from '@/views/UserListPage.vue'
 import NotFoundPage from '@/views/NotFoundPage.vue'
 
 Vue.use(VueRouter)
@@ -28,13 +29,18 @@ const routes = [
   },
   {
     path: '/profile/:id',
-    name: ProfilePage,
+    name: 'ProfilePage',
     component: ProfilePage
   },
   {
     path: '/profile/:id/edit',
     name: ProfileEditPage,
     component: ProfileEditPage
+  },
+  {
+    path: '/users',
+    name: UserListPage,
+    component: UserListPage
   },
   {
     path: '*',

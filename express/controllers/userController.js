@@ -79,7 +79,7 @@ const updateUserInfo = (req, res) => {
 
   userModel.updateUserInfo(email, userData, (err, userId) => {
     if (err)
-      return res.status(500).send({ message: 'Ошибка сервера '});
+      return res.status(500).send({ message: 'Ошибка сервера'});
     res.status(200).send({ id: userId.id });
   });
 };
@@ -96,9 +96,18 @@ const getUserById = (req, res) => {
   });
 };
 
+const getAllUsers = async (req, res) => {
+  userModel.getAllUsers((err, users) => {
+    if (err)
+      return res.status(500).send({ message: 'Ошибка сервера' });
+    res.status(200).send(users);
+  });
+};
+
 module.exports = {
   updateUserInfo,
   getUserById,
+  getAllUsers,
   updateEmail,
   updatePassword
 };

@@ -41,6 +41,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
 export default {
+  name: 'ProfilePage',
   components: {
     UserProfile
   },

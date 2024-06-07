@@ -20,6 +20,12 @@ const getUserById = (id, callback) => {
   });
 };
 
+const getAllUsers = (callback) => {
+  db.all('SELECT * FROM users', (err, rows) => {
+    callback(err, rows);
+  });
+};
+
 const updateEmail = (id, newEmail, callback) => {
   const stmt = db.prepare('UPDATE users SET email = ? WHERE id = ?');
   stmt.run(newEmail, id, (err) => {
@@ -75,6 +81,7 @@ module.exports = {
 	createUser,
 	getUserByEmail,
   getUserById,
+  getAllUsers,
 	updateUserInfo,
   updateEmail,
   updatePassword
