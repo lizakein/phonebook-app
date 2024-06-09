@@ -57,8 +57,10 @@ const checkAccessRequestStatus = (req, res) => {
   });
 };
 
-const getAllAccessRequests = (req, res) => {
-  accessModel.getAllAccessRequests((err, requests) => {
+const getAllAccessRequestsByStatus = (req, res) => {
+  const status = req.query.status;
+
+  accessModel.getAllAccessRequestsByStatus(status, (err, requests) => {
     if (err) return res.status(500).send({ message: 'Ошибка получения всех запросов' });
     res.status(200).send({ requests });
   });
@@ -70,5 +72,5 @@ module.exports = {
   updateAccessRequestStatus,
   checkAccessRequest,
   checkAccessRequestStatus,
-  getAllAccessRequests
+  getAllAccessRequestsByStatus
 };

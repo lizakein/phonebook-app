@@ -3,6 +3,17 @@
     <AdminDashboard />
     <div class="admin-access-requests">
       <h2 class="access-title">Запросы на доступ</h2>
+      <label for="status-filter">Фильтр по статусу</label>
+      <select 
+        id="status-filter" 
+        v-model="selectedStatus" 
+        @change="fetchAccessRequests"
+      >
+        <option value="">Все</option>
+        <option value="pending">Ожидает</option>
+        <option value="accepted">Одобрено</option>
+        <option value="rejected">Отклонено</option>
+      </select>
       <table>
         <thead>
           <tr>
@@ -46,7 +57,8 @@ export default {
   },
   data() {
     return {
-      accessRequests: []
+      accessRequests: [],
+      selectedStatus: ''
     };
   },
   async created() {
@@ -58,6 +70,9 @@ export default {
         const response = await axios.get('http://localhost:3000/access/access-requests', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          params: {
+            status: this.selectedStatus
           }
         });
         this.accessRequests = response.data.requests.map(request => ({
@@ -91,6 +106,12 @@ export default {
 
 .access-title {
   margin-top: 60px;
+}
+
+#status-filter {
+  margin-left: 10px;
+  margin-bottom: 20px;
+  padding: 5px;
 }
 
 table {

@@ -51,8 +51,16 @@ const checkAccessRequestStatus = (requesterId, ownerId, callback) => {
   });
 };
 
-const getAllAccessRequests = (callback) => {
-  db_requests.all('SELECT * FROM access_requests', async (err, rows) => {
+const getAllAccessRequestsByStatus = (status, callback) => {
+  let query = 'SELECT * FROM access_requests';
+  const queryParams = [];
+
+  if (status) {
+    query += ' Where status = ?';
+    queryParams.push(status);
+  }
+
+  db_requests.all(query, queryParams, async (err, rows) => {
     if (err) return callback(err);
 
     const requestsWithUserInfo = await Promise.all(rows.map(async (request) => {
@@ -81,5 +89,5 @@ module.exports = {
   updateAccessRequestStatus,
   checkAccessRequest,
   checkAccessRequestStatus,
-  getAllAccessRequests
+  getAllAccessRequestsByStatus
 };
