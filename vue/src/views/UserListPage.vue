@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header />
+    <component :is="currentHeaderComponent" />
     <div class="page-container">
       <div class="user-grid">
         <UserCard v-for="user in users" :key="user.id" :user="user" />
@@ -11,21 +11,26 @@
 
 <script>
 import Header from '@/components/Header.vue';
+import AdminDashboard from '@/components/AdminDashboard.vue'
 import UserCard from '@/components/UserCard.vue';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 export default {
   name: 'UserListPage',
   components: {
     UserCard,
-    Header
+    Header,
+    AdminDashboard
   },
   data() {
     return {
-      users: []
+      users: [],
+       currentHeaderComponent: 'Header'
     };
   },
   async created() {
+    this.fetchCurrentUser();
     await this.fetchUsers();
   },
   methods: {
@@ -39,6 +44,20 @@ export default {
         this.users = response.data;
       } catch (error) {
         console.error('Ошибка получения списка пользователей', error);
+      }
+    },
+    fetchCurrentUser() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          this.currentHeaderComponent = decodedToken.role === 'admin' ? 'AdminDashboard' : 'Header';
+        } catch (error) {
+          console.error('Ошибка декодирования токена', error);
+          this.$router.push('/login');
+        }
+      } else {
+        this.$router.push('/login');
       }
     }
   }

@@ -51,7 +51,7 @@ export default {
         const token = response.data.token;
         localStorage.setItem('token', token);  
         
-        this.$router.push({ path: '/admin/users'});    
+        this.$router.push({ path: '/users'});    
       } catch (error) {
         if (error.response.status === 401)
           this.errorMessage = 'Неправильный логин и/или пароль';
