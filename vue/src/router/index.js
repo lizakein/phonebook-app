@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomePage from '@/App.vue' 
 import LoginPage from '@/views/LoginPage.vue'
+import AdminLoginPage from '@/views/AdminLoginPage.vue'
 import UserInfoPage from '@/views/UserInfoPage.vue'
 import ProfilePage from '@/views/ProfilePage.vue'
 import ProfileEditPage from '@/views/ProfileEditPage.vue'
@@ -41,6 +42,11 @@ const routes = [
     path: '/users',
     name: UserListPage,
     component: UserListPage
+  },
+  {
+    path: '/admin/login', 
+    name: AdminLoginPage,
+    component: AdminLoginPage 
   },
   {
     path: '*',
