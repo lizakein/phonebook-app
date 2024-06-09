@@ -51,10 +51,35 @@ const checkAccessRequestStatus = (requesterId, ownerId, callback) => {
   });
 };
 
+const getAllAccessRequests = (callback) => {
+  db_requests.all('SELECT * FROM access_requests', async (err, rows) => {
+    if (err) return callback(err);
+
+    const requestsWithUserInfo = await Promise.all(rows.map(async (request) => {
+      return new Promise((resolve, reject) => {
+        userModel.getUserById(request.requester_id, (err, requester) => {
+          if (err) return reject(err);
+          userModel.getUserById(request.owner_id, (err, owner) => {
+            if (err) return reject(err);
+            resolve({
+              ...request,
+              requesterFullName: requester.fullName,
+              ownerFullName: owner.fullName
+            });
+          });
+        });
+      });
+    }));
+
+    callback(null, requestsWithUserInfo);
+  });
+};
+
 module.exports = {
   createAccessRequest,
   getAccessRequestsByUserId,
   updateAccessRequestStatus,
   checkAccessRequest,
-  checkAccessRequestStatus
+  checkAccessRequestStatus,
+  getAllAccessRequests
 };

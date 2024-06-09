@@ -54,13 +54,21 @@ const checkAccessRequestStatus = (req, res) => {
       return res.status(200).send({ status });
     else
       return res.status(404).send({ message: 'Запрос не найден' });
-  })
-}
+  });
+};
+
+const getAllAccessRequests = (req, res) => {
+  accessModel.getAllAccessRequests((err, requests) => {
+    if (err) return res.status(500).send({ message: 'Ошибка получения всех запросов' });
+    res.status(200).send({ requests });
+  });
+};
 
 module.exports = {
   createAccessRequest,
   getAccessRequestsByUserId,
   updateAccessRequestStatus,
   checkAccessRequest,
-  checkAccessRequestStatus
+  checkAccessRequestStatus,
+  getAllAccessRequests
 };
