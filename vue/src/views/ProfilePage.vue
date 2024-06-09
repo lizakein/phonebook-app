@@ -1,5 +1,7 @@
 <template>
-  <div class="page-container">
+  <div>
+    <Header />
+    <div class="page-container">
     <div class="container">
       <UserProfile 
         :userData="user" 
@@ -33,9 +35,11 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
   
 <script>
+import Header from '@/components/Header.vue';
 import UserProfile from '../components/UserProfile.vue';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
@@ -43,7 +47,8 @@ import { jwtDecode } from 'jwt-decode';
 export default {
   name: 'ProfilePage',
   components: {
-    UserProfile
+    UserProfile,
+    Header
   },
   data() {
     return {
@@ -53,6 +58,9 @@ export default {
       requests: [],
       hasHiddenPhone: false
     };
+  },
+  watch: {
+    '$route.params.id': 'fetchUserData'
   },
   computed: {
     pendingRequests() {

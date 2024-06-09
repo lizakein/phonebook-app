@@ -1,19 +1,24 @@
 <template>
-  <div class="page-container">
-    <div class="user-grid">
-      <UserCard v-for="user in users" :key="user.id" :user="user" />
+  <div>
+    <Header />
+    <div class="page-container">
+      <div class="user-grid">
+        <UserCard v-for="user in users" :key="user.id" :user="user" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Header from '@/components/Header.vue';
 import UserCard from '@/components/UserCard.vue';
 import axios from 'axios';
 
 export default {
   name: 'UserListPage',
   components: {
-    UserCard
+    UserCard,
+    Header
   },
   data() {
     return {
