@@ -1,4 +1,4 @@
-const db = require('../database');
+const { db } = require('../database');
 
 const createUser = (email, hashedPassword, callback) => {
 	const stmt = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
@@ -12,6 +12,34 @@ const getUserByEmail = (email, callback) => {
 	db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
 		callback(err, row);
 	});
+};
+
+const getUserById = (id, callback) => {
+  db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+    callback(err, row);
+  });
+};
+
+const getAllUsers = (callback) => {
+  db.all('SELECT * FROM users', (err, rows) => {
+    callback(err, rows);
+  });
+};
+
+const updateEmail = (id, newEmail, callback) => {
+  const stmt = db.prepare('UPDATE users SET email = ? WHERE id = ?');
+  stmt.run(newEmail, id, (err) => {
+    callback(err);
+  });
+  stmt.finalize();
+};
+
+const updatePassword = (id, newPassword, callback) => {
+  const stmt = db.prepare('UPDATE users SET password = ? WHERE id = ?');
+  stmt.run(newPassword, id, (err) => {
+    callback(err);
+  });
+  stmt.finalize();
 };
 
 const updateUserInfo = (email, userData, callback) => {
@@ -40,7 +68,7 @@ const updateUserInfo = (email, userData, callback) => {
       WHERE email = ?
     `);
     stmt.run(
-      fullName, birthdate, hideYear ? 1 : 0, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
+      fullName, birthdate, hideYear, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
       function(err) {
         callback(err, { id: userId });
       }
@@ -52,5 +80,9 @@ const updateUserInfo = (email, userData, callback) => {
 module.exports = {
 	createUser,
 	getUserByEmail,
-	updateUserInfo
+  getUserById,
+  getAllUsers,
+	updateUserInfo,
+  updateEmail,
+  updatePassword
 };
