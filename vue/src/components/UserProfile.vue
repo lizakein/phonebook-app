@@ -3,14 +3,14 @@
     <div class="photo-section">
       <img v-if="user.photo" :src="getPhotoUrl(user.photo)" alt="Фото пользователя">
       <button 
-        v-if="isOwner" 
+        v-if="isOwner || isAdmin"
         class="button" 
         @click="editProfile"
       >
         Редактировать профиль
       </button>
       <button 
-        v-if="!isOwner && hasHiddenPhone && !requestExists" 
+        v-if="!isOwner && !isAdmin && hasHiddenPhone && !requestExists" 
         class="button" 
         @click="requestAccess"
       >
@@ -42,6 +42,11 @@ export default {
       required: true
     },
     isOwner: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    isAdmin: {
       type: Boolean,
       required: true,
       default: false
@@ -98,7 +103,7 @@ export default {
         }
 
         let accessGranted = false;
-        if (!this.isOwner) {
+        if (!this.isOwner && !this.isAdmin) {
           try {
             const response = await axios.get(`http://localhost:3000/access/access-request/status/${this.currentUserId}/${this.user.id}`, {
               headers: {
@@ -116,7 +121,7 @@ export default {
         }
 
         personalPhones.forEach(phone => {
-          if (phone.hide && !this.isOwner && !accessGranted) 
+          if (phone.hide && !this.isOwner && !this.isAdmin && !accessGranted) 
             this.hasHiddenPhone = true;
           else 
             if (!this.personalPhones.some(item => item.number === phone.number))
@@ -164,7 +169,7 @@ export default {
       }
     },
     async checkAccessRequest() {
-      if (this.currentUserId !== this.user.id && this.hasHiddenPhone) {
+      if (!this.isAdmin && this.currentUserId !== this.user.id && this.hasHiddenPhone) {
         try {
         const response = await axios.get(`http://localhost:3000/access/access-request/check/${this.currentUserId}/${this.user.id}`, {
           headers: {

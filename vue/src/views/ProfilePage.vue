@@ -1,14 +1,15 @@
 <template>
   <div>
-    <Header />
+    <component :is="currentHeaderComponent" />
     <div class="page-container">
     <div class="container">
       <UserProfile 
         :userData="user" 
-        :isOwner="user?.isOwner"
+        :isOwner="isOwner"
+        :isAdmin="isAdmin"
         v-if="user"
       />
-      <div v-if="user && user?.isOwner" class="requests-section">
+      <div v-if="user && isOwner" class="requests-section">
         <h2>Запросы на просмотр личного номера</h2>
         <div v-if="requests.length === 0">
           <p v-if="!hasHiddenPhone">Ваш номер могут видеть все</p>
@@ -43,20 +44,24 @@ import Header from '@/components/Header.vue';
 import UserProfile from '../components/UserProfile.vue';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import AdminDashboard from '@/components/AdminDashboard.vue';
 
 export default {
   name: 'ProfilePage',
   components: {
     UserProfile,
-    Header
+    Header,
+    AdminDashboard
   },
   data() {
     return {
       user: null,
       currentUserId: null,
       isOwner: false,
+      isAdmin: false,
       requests: [],
-      hasHiddenPhone: false
+      hasHiddenPhone: false,
+      currentHeaderComponent: 'Header'
     };
   },
   watch: {
@@ -80,7 +85,7 @@ export default {
         this.isOwner = this.user.id === this.currentUserId;
         if (this.isOwner) {
           this.checkHiddenPhone();
-          this.fetchAccessRequests();
+          if (!this.isAdmin) this.fetchAccessRequests();
         }
       } catch(error) {
         console.error('Ошибка получения пользовательских данных', error);
@@ -92,6 +97,8 @@ export default {
         if (token) {
           const decodedToken = jwtDecode(token);
           this.currentUserId = decodedToken.id;
+          this.isAdmin = decodedToken.role === 'admin';
+          this.currentHeaderComponent = decodedToken.role === 'admin' ? 'AdminDashboard' : 'Header';
         } 
       } catch (error) {
         console.error('Ошибка получения данных текущего пользователя из токена', error);

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 const updateEmail = (req, res) => {
   const { newEmail } = req.body;
-  const userId = req.user.id;
+  const userId = req.user.role === 'admin' ? req.params.id : req.user.id;
 
   if (!newEmail) 
     return res.status(400).send({ message: 'Некорректный email' });
@@ -25,18 +25,23 @@ const updateEmail = (req, res) => {
 
 const updatePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
-  const userId = req.user.id;
+  const userId = req.user.role === 'admin' ? req.params.id : req.user.id;
 
-  if (!oldPassword || !newPassword) 
+  if (!newPassword) 
     return res.status(400).send({ message: 'Некорректный пароль' });
 
   userModel.getUserById(userId, async (err, user) => {
     if (err || !user) 
       return res.status(404).send({ message: 'Пользователь не найден' });
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch) 
-      return res.status(409).send({ message: 'Старый пароль некорректен' });
+    if (req.user.role !== 'admin') {
+      if (!oldPassword) 
+        return res.status(400).send({ message: 'Старый пароль обязателен' });
+
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) 
+        return res.status(409).send({ message: 'Старый пароль некорректен' });
+    }    
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     userModel.updatePassword(userId, hashedPassword, (err) => {

@@ -36,7 +36,7 @@
 import UserDataForm from '@/components/UserDataForm.vue';
 import UserSettingsForm from '@/components/UserSettingsForm.vue';
 import axios from 'axios';
-
+import { jwtDecode } from 'jwt-decode';
 
 export default {
   components: {
@@ -48,7 +48,8 @@ export default {
       user: null,
       token: '',
       formMode: 'settings',
-      errorMessage: ''
+      errorMessage: '',
+      isAdmin: false
     };
   },
   methods: {
@@ -98,8 +99,10 @@ export default {
         let emailResponse = { status: 200 };
         let passwordResponse = { status: 200 };
 
+        const userId = this.$route.params.id;
+
         if (data.newEmail) {
-          emailResponse = await axios.post('http://localhost:3000/user/update-email', { newEmail: data.newEmail }, {
+          emailResponse = await axios.post(`http://localhost:3000/user/update-email/${userId}`, { newEmail: data.newEmail }, {
             headers: {
               'Authorization': `Bearer ${this.token}`,
               'Content-Type': 'application/json'
@@ -107,11 +110,10 @@ export default {
           });
         }
 
-        if (data.oldPassword && data.newPassword) {
-          passwordResponse = await axios.post('http://localhost:3000/user/update-password', {
-            oldPassword: data.oldPassword,
-            newPassword: data.newPassword
-          }, {
+        if (data.newPassword) {
+          const payload = this.isAdmin ? { newPassword: data.newPassword } : { oldPassword: data.oldPassword, newPassword: data.newPassword }
+
+          passwordResponse = await axios.post(`http://localhost:3000/user/update-password/${userId}`, payload, {
             headers: {
               'Authorization': `Bearer ${this.token}`,
               'Content-Type': 'application/json'
@@ -153,10 +155,21 @@ export default {
     },
     backToProfile() {
       this.$router.push(`/profile/${this.user.id}`);
+    },
+    decodeToken() {
+      try {
+        if (this.token) {
+          const decodedToken = jwtDecode(this.token);
+          this.isAdmin = decodedToken.role === 'admin';
+        } 
+      } catch (error) {
+        console.error('Ошибка получения данных текущего пользователя из токена', error);
+      }
     }
   },
   created() {
     this.token = localStorage.getItem('token');
+    this.decodeToken();
     this.fetchUserData();
   }
 }
