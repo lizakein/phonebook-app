@@ -3,17 +3,32 @@
     <AdminDashboard />
     <div class="admin-access-requests">
       <h2 class="access-title">Запросы на доступ</h2>
-      <label for="status-filter">Фильтр по статусу</label>
-      <select 
-        id="status-filter" 
-        v-model="selectedStatus" 
-        @change="fetchAccessRequests"
-      >
-        <option value="">Все</option>
-        <option value="pending">Ожидает</option>
-        <option value="accepted">Одобрено</option>
-        <option value="rejected">Отклонено</option>
-      </select>
+      <div class="filter-container">
+        <div class="filter-item">
+          <label for="status-filter">Фильтр по статусу</label>
+          <select 
+            id="status-filter" 
+            v-model="selectedStatus" 
+            @change="fetchAccessRequests"
+          >
+            <option value="">Все</option>
+            <option value="pending">Ожидает</option>
+            <option value="accepted">Одобрено</option>
+            <option value="rejected">Отклонено</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label for="sort-order">Сортировка по дате</label>
+          <select 
+            id="sort-order" 
+            v-model="sortOrder" 
+            @change="fetchAccessRequests"
+          >
+            <option value="DESC">От новых к старым</option>
+            <option value="ASC">От старых к новым</option>
+          </select>
+        </div>
+      </div>  
       <table>
         <thead>
           <tr>
@@ -21,6 +36,7 @@
             <th>Запрашиваемый</th>
             <th>Статус</th>
             <th>Действие</th>
+            <th>Дата создания</th>
           </tr>
         </thead>
         <tbody>
@@ -39,6 +55,7 @@
                 <option value="rejected">Отклонено</option>
               </select>
             </td>
+            <td>{{ request.created_at }}</td>
           </tr>
         </tbody>
       </table>
@@ -58,7 +75,8 @@ export default {
   data() {
     return {
       accessRequests: [],
-      selectedStatus: ''
+      selectedStatus: '',
+      sortOrder: 'DESC'
     };
   },
   async created() {
@@ -72,7 +90,8 @@ export default {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
           params: {
-            status: this.selectedStatus
+            status: this.selectedStatus,
+            sortOrder: this.sortOrder
           }
         });
         this.accessRequests = response.data.requests.map(request => ({
@@ -108,10 +127,16 @@ export default {
   margin-top: 60px;
 }
 
-#status-filter {
-  margin-left: 10px;
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 20px;
-  padding: 5px;
+}
+
+#status-filter,
+#sort-order {
+  margin-left: 10px;
 }
 
 table {

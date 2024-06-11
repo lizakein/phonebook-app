@@ -57,10 +57,11 @@ const checkAccessRequestStatus = (req, res) => {
   });
 };
 
-const getAllAccessRequestsByStatus = (req, res) => {
+const getAllAccessRequestsByStatusAndSort = (req, res) => {
   const status = req.query.status;
+  const sortOrder = req.query.sortOrder || 'DESC';
 
-  accessModel.getAllAccessRequestsByStatus(status, (err, requests) => {
+  accessModel.getAllAccessRequestsByStatusAndSort(status, sortOrder, (err, requests) => {
     if (err) return res.status(500).send({ message: 'Ошибка получения всех запросов' });
     res.status(200).send({ requests });
   });
@@ -72,5 +73,5 @@ module.exports = {
   updateAccessRequestStatus,
   checkAccessRequest,
   checkAccessRequestStatus,
-  getAllAccessRequestsByStatus
+  getAllAccessRequestsByStatusAndSort
 };

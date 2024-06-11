@@ -47,7 +47,8 @@ db_requests.serialize(() => {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			requester_id INTEGER,
 			owner_id INTEGER,
-			status TEXT DEFAULT 'pending'
+			status TEXT DEFAULT 'pending',
+			created_at TEXT DEFAULT CURRENT_TIMESTAMP
 		)
 	`);
 });

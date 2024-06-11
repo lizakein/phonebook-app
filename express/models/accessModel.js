@@ -7,7 +7,7 @@ const createAccessRequest = (requesterId, ownerId, callback) => {
     if (row) return callback(null, { message: 'Запрос уже существует' });
   });
 
-  db_requests.run('INSERT INTO access_requests (requester_id, owner_id) VALUES (?, ?)', [requesterId, ownerId], function (err) {
+  db_requests.run('INSERT INTO access_requests (requester_id, owner_id, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)', [requesterId, ownerId], function (err) {
     callback(err, this.lastID);
   });
 };
@@ -51,14 +51,16 @@ const checkAccessRequestStatus = (requesterId, ownerId, callback) => {
   });
 };
 
-const getAllAccessRequestsByStatus = (status, callback) => {
+const getAllAccessRequestsByStatusAndSort = (status, sortOrder, callback) => {
   let query = 'SELECT * FROM access_requests';
   const queryParams = [];
 
   if (status) {
-    query += ' Where status = ?';
+    query += ' WHERE status = ?';
     queryParams.push(status);
   }
+
+  query += ' ORDER BY created_at ' + (sortOrder === 'ASC' ? 'ASC' : 'DESC');
 
   db_requests.all(query, queryParams, async (err, rows) => {
     if (err) return callback(err);
@@ -89,5 +91,5 @@ module.exports = {
   updateAccessRequestStatus,
   checkAccessRequest,
   checkAccessRequestStatus,
-  getAllAccessRequestsByStatus
+  getAllAccessRequestsByStatusAndSort
 };
