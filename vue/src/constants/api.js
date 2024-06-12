@@ -22,7 +22,7 @@ export const USER_ENDPOINTS = {
 export const ACCESS_ENDPOINTS = {
   CREATE_ACCESS_REQUEST: `${BASE_URL}/access/access-request`,
   UPDATE_REQUEST_STATUS: (requestId) => `${BASE_URL}/access/access-request/${requestId}`,
-  GET_REQUESTS_BY_USER_ID: (userId) => `${BASE_URL}/access/access-request/${userId}`,
+  GET_REQUESTS_BY_USER_ID: (userId) => `${BASE_URL}/access/access-requests/${userId}`,
   GET_ALL_REQUESTS: `${BASE_URL}/access/access-requests`,
   CHECK_REQUEST: (requesterId, ownerId) => `${BASE_URL}/access/access-request/check/${requesterId}/${ownerId}`,
   CHECK_REQUEST_STATUS: (requesterId, ownerId) => `${BASE_URL}/access/access-request/status/${requesterId}/${ownerId}`

@@ -44,6 +44,7 @@ import axios from 'axios';
 import { BASE_URL, USER_ENDPOINTS } from '@/constants/api';
 import { String } from 'core-js';
 import { jwtDecode } from 'jwt-decode';
+import apiProvider from '@/services/apiProvider';
 
 export default {
   name: 'UserProfile',
@@ -116,12 +117,7 @@ export default {
         let accessGranted = false;
         if (!this.isOwner && !this.isAdmin) {
           try {
-            const response = await axios.get(`http://localhost:3000/access/access-request/status/${this.currentUserId}/${this.user.id}`, {
-              headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              }
-            });
-
+            const response = await apiProvider.chackAccessStatus(this.currentUserId, this.user.id);
             accessGranted = response.data.status === 'accepted';
           } catch (error) {
             if (error.response && error.response.status === 404)
@@ -166,12 +162,7 @@ export default {
     },
     async requestAccess() {
       try {
-        await axios.post('http://localhost:3000/access/access-request', { ownerId: this.user.id }, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
+        await apiProvider.requestAccess(this.user.id);
         alert('Запрос на доступ к личному номеру отправлен');
         this.requestExists = true;
       } catch(error) {
@@ -182,13 +173,8 @@ export default {
     async checkAccessRequest() {
       if (!this.isAdmin && this.currentUserId !== this.user.id && this.hasHiddenPhone) {
         try {
-        const response = await axios.get(`http://localhost:3000/access/access-request/check/${this.currentUserId}/${this.user.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        this.requestExists = response.data.exists;
+          const response = await apiProvider.checkAccessRequest(this.currentUserId, this.user.id);
+          this.requestExists = response.data.exists;
         } catch (error) {
           if (error.response && error.response.status === 404)
             this.requestExists = false;

@@ -46,6 +46,7 @@ import UserProfile from '../components/UserProfile.vue';
 import axios from 'axios';
 import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
+import apiProvider from '@/services/apiProvider';
 
 export default {
   name: 'ProfilePage',
@@ -86,7 +87,7 @@ export default {
         this.isOwner = this.user.id === this.currentUserId;
         if (this.isOwner) {
           this.checkHiddenPhone();
-          if (!this.isAdmin) this.fetchAccessRequests();
+          if (!this.isAdmin) this.fetchAccessRequests(this.userId);
         }
       } catch(error) {
         console.error('Ошибка получения пользовательских данных', error);
@@ -105,14 +106,9 @@ export default {
         console.error('Ошибка получения данных текущего пользователя из токена', error);
       }
     },
-    async fetchAccessRequests() {
+    async fetchAccessRequests(userId) {
       try {
-        const response = await axios.get(`http://localhost:3000/access/access-requests/${this.user.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        this.requests = response.data.requests.filter(request => request.status === 'pending');
+        this.requests = await apiProvider.fetchAccessRequests(userId, 'pending');
       } catch (error) {
         console.error('Ошибка получения запросов на доступ', error);
       }
@@ -130,26 +126,16 @@ export default {
     },
     async acceptRequest(request) {
       try {
-        await axios.put(`http://localhost:3000/access/access-request/${request.id}`, { status: 'accepted' }, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        this.fetchAccessRequests();
+        await apiProvider.updateAccessRequestStatus(request.id, 'accepted');
+        this.fetchAccessRequests(this.user.id);
       } catch (error) {
         console.error('Ошибка при принятии запроса', error);
       }
     },
     async rejectRequest(request) {
       try {
-        await axios.put(`http://localhost:3000/access/access-request/${request.id}`, { status: 'rejected' }, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        this.fetchAccessRequests();
+        await apiProvider.updateAccessRequestStatus(request.id, 'rejected');
+        this.fetchAccessRequests(this.user.id);
       } catch (error) {
         console.error('Ошибка при отклонении запроса', error);
       }

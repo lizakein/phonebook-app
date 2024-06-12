@@ -65,7 +65,7 @@
 
 <script>
 import AdminDashboard from '@/components/AdminDashboard.vue';
-import axios from 'axios';
+import apiProvider from '@/services/apiProvider';
 
 export default {
   name: 'AdminAccessRequests',
@@ -80,36 +80,20 @@ export default {
     };
   },
   async created() {
-    await this.fetchAccessRequests();
+    await this.fetchAllAccessRequests();
   },
   methods: {
-    async fetchAccessRequests() {
+    async fetchAllAccessRequests() {
       try {
-        const response = await axios.get('http://localhost:3000/access/access-requests', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          params: {
-            status: this.selectedStatus,
-            sortOrder: this.sortOrder
-          }
-        });
-        this.accessRequests = response.data.requests.map(request => ({
-          ...request,
-          newStatus: request.status
-        }));
+        this.accessRequests = await apiProvider.fetchAllAccessRequests({ status: this.selectedStatus, sortOrder: this.sortOrder });
       } catch (error) {
         console.error('Ошибка получения запросов на доступ', error);
       }
-    },
-    async updateStatus(requestId, newStatus) {
+    }, 
+    async updateAccessRequestStatus(requestId, newStatus) {
       try {
-        await axios.put(`http://localhost:3000/access/access-request/${requestId}`, { status: newStatus }, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        this.fetchAccessRequests();
+        await apiProvider.updateAccessRequestStatus(requestId, newStatus)
+        this.fetchAllAccessRequests();
       } catch (error) {
         console.error('Ошибка обновления статуса запроса', error);
       }
