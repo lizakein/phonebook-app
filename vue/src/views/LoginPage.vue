@@ -85,6 +85,8 @@ export default {
           this.errorMessage = 'Этот email уже занят';
         else if (error.response.status === 401)
           this.errorMessage = 'Неправильный логин и/или пароль';
+        else if (error.response.status === 403)
+          this.errorMessage = 'Ваш аккаунт заблокирован';
         else
           this.errorMessage = 'Ошибка сервера';
       }

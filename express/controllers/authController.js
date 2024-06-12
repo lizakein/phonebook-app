@@ -30,6 +30,10 @@ const login = (req, res) => {
   userModel.getUserByEmail(email, async (err, row) => {
     if (err) 
       return res.status(500).send({ message: 'Ошибка сервера' });
+
+    if (row.isBlocked)
+      return res.status(403).send({ message: 'Аккаунт заблокирован' });
+
     if (!row || !(await bcrypt.compare(password, row.password))) 
       return res.status(401).send({ message: 'Неправильный логин и/или пароль' });   
 

@@ -10,6 +10,13 @@
         Редактировать профиль
       </button>
       <button 
+        v-if="isAdmin"
+        :class="['button', { 'blocked-button': user.isBlocked }]" 
+        @click="toggleBlockUser"
+      >
+        {{ user.isBlocked ? 'Разблокировать' : 'Заблокировать' }}
+      </button>
+      <button 
         v-if="!isOwner && !isAdmin && hasHiddenPhone && !requestExists" 
         class="button" 
         @click="requestAccess"
@@ -189,6 +196,25 @@ export default {
       } else {
         this.requestExists = true;
       }
+    },
+    async toggleBlockUser() {
+      try {
+        const userId = this.$route.params.id;
+        const newBlockStatus = !this.user.isBlocked;
+        const token = localStorage.getItem('token');
+
+        const response = await axios.post(`http://localhost:3000/user/block-user/${userId}`, {isBlocked: newBlockStatus}, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.status === 200)
+          this.user.isBlocked = newBlockStatus;
+      } catch (error) {
+        console.error(error);
+      }
     }
   },
   async mounted() {
@@ -219,6 +245,11 @@ export default {
 .button {
   width: 100%;
   margin-top: 2%;
+}
+
+.blocked-button {
+  background-color: grey;
+  color: white; 
 }
 
 .photo-section img {

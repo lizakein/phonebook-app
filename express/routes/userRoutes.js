@@ -1,7 +1,8 @@
 const express = require('express');
-const { updateUserInfo, getUserById, updateEmail, updatePassword, getAllUsers } = require('../controllers/userController');
+const { updateUserInfo, getUserById, updateEmail, updatePassword, getAllUsers, updateUserBlockStatus } = require('../controllers/userController');
 const upload = require('../config/uploadConfig');
 const { authenticateToken } = require('../middleware/authMiddleware');
+const { checkAdminRole } = require('../middleware/adminMiddleware');
 
 const router = express.Router();
 
@@ -10,5 +11,6 @@ router.get('/:id', authenticateToken, getUserById);
 router.post('/update-email/:id', authenticateToken, updateEmail);
 router.post('/update-password/:id', authenticateToken, updatePassword);
 router.get('/', authenticateToken, getAllUsers);
+router.post('/block-user/:id', authenticateToken, checkAdminRole, updateUserBlockStatus);
 
 module.exports = router;

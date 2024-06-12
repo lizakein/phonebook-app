@@ -1,8 +1,8 @@
 const { db } = require('../database');
 
 const createUser = (email, hashedPassword, callback) => {
-	const stmt = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
-	stmt.run(email, hashedPassword, function(err) {
+	const stmt = db.prepare('INSERT INTO users (email, password, isBlocked) VALUES (?, ?, ?)');
+	stmt.run(email, hashedPassword, 0, function(err) {
 		callback(err, this.lastID);
 	});
 	stmt.finalize();
@@ -77,6 +77,14 @@ const updateUserInfo = (email, userData, callback) => {
   });
 };
 
+const updateUserBlockStatus = (id, isBlocked, callback) => {
+  const stmt = db.prepare('UPDATE users SET isBlocked = ? WHERE id = ?');
+  stmt.run(isBlocked, id, (err) => {
+    callback(err);
+  });
+  stmt.finalize();
+};
+
 module.exports = {
 	createUser,
 	getUserByEmail,
@@ -84,5 +92,6 @@ module.exports = {
   getAllUsers,
 	updateUserInfo,
   updateEmail,
-  updatePassword
+  updatePassword,
+  updateUserBlockStatus
 };

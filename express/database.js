@@ -36,7 +36,8 @@ db.serialize(() => {
 			position TEXT,
 			office TEXT,
 			about TEXT,
-			photo TEXT
+			photo TEXT,
+			isBlocked INTEGER NOT NULL
 		)
 	`);
 });

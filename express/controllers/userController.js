@@ -109,10 +109,22 @@ const getAllUsers = async (req, res) => {
   });
 };
 
+const updateUserBlockStatus = (req, res) => {
+  const userId = req.params.id;
+  const { isBlocked } = req.body;
+
+  userModel.updateUserBlockStatus(userId, isBlocked, (err) => {
+    if (err)
+      return res.status(500).send({ message: 'Ошибка сервера' });
+    res.status(200).send({ message: `Пользователь ${isBlocked ? 'заблокирован' : 'разблокирован'}` });
+  });
+};
+
 module.exports = {
   updateUserInfo,
   getUserById,
   getAllUsers,
   updateEmail,
-  updatePassword
+  updatePassword,
+  updateUserBlockStatus
 };
