@@ -109,6 +109,16 @@ const getAllUsers = async (req, res) => {
   });
 };
 
+const getUsersByBlockStatus = (req, res) => {
+  const { blocked } = req.query;
+  userModel.getUsersByBlockStatus(blocked, (err, users) => {
+    if (err) return res.status(500).send({ message: 'Ошибка сервера' });
+    if (!users || users.length === 0)
+      return res.status(404).send({ message: 'Пользователи не найдены' });
+    res.status(200).send(users);
+  });
+};
+
 const updateUserBlockStatus = (req, res) => {
   const userId = req.params.id;
   const { isBlocked } = req.body;
@@ -126,5 +136,6 @@ module.exports = {
   getAllUsers,
   updateEmail,
   updatePassword,
-  updateUserBlockStatus
+  updateUserBlockStatus,
+  getUsersByBlockStatus
 };

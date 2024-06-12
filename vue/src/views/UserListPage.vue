@@ -4,6 +4,7 @@
     <div class="page-container">
       <div class="user-grid">
         <UserCard v-for="user in users" :key="user.id" :user="user" />
+        <div v-if="isEmptyList" class="empty-list">Список пуст</div>
       </div>
     </div>
   </div>
@@ -23,10 +24,17 @@ export default {
     Header,
     AdminDashboard
   },
+  props: {
+    blocked: {
+      type: Number,
+      default: 0
+    }
+  },
   data() {
     return {
       users: [],
-       currentHeaderComponent: 'Header'
+      isEmptyList: false,
+      currentHeaderComponent: 'Header'
     };
   },
   async created() {
@@ -36,12 +44,16 @@ export default {
   methods: {
     async fetchUsers() {
       try {
-        const response = await axios.get('http://localhost:3000/user', {
+        const response = await axios.get('http://localhost:3000/user/block-list', {
+          params: {
+            blocked: this.blocked
+          },
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
         this.users = response.data;
+        if (this.users.length === 0) this.isEmptyList = true;
       } catch (error) {
         console.error('Ошибка получения списка пользователей', error);
       }
@@ -76,5 +88,12 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   width: 100%;
+}
+
+.empty-list {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 50px;
+  color: gray;
 }
 </style>

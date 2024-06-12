@@ -8,6 +8,7 @@ import ProfilePage from '@/views/ProfilePage.vue'
 import ProfileEditPage from '@/views/ProfileEditPage.vue'
 import UserListPage from '@/views/UserListPage.vue'
 import AdminAccessRequestsPage from '@/views/AdminAccessRequestsPage.vue'
+import BlockedUsersPage from '@/views/BlockedUsersPage.vue'
 import NotFoundPage from '@/views/NotFoundPage.vue'
 
 Vue.use(VueRouter)
@@ -53,6 +54,11 @@ const routes = [
     path: '/admin/requests', 
     name: AdminAccessRequestsPage,
     component: AdminAccessRequestsPage 
+  },
+  {
+    path: '/admin/blocked-users', 
+    name: BlockedUsersPage,
+    component: BlockedUsersPage
   },
   {
     path: '*',

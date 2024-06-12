@@ -26,6 +26,12 @@ const getAllUsers = (callback) => {
   });
 };
 
+const getUsersByBlockStatus = (blocked, callback) => {
+  db.all('SELECT * FROM users WHERE isBlocked = ?', [blocked], (err, rows) => {
+    callback(err, rows);
+  });
+};
+
 const updateEmail = (id, newEmail, callback) => {
   const stmt = db.prepare('UPDATE users SET email = ? WHERE id = ?');
   stmt.run(newEmail, id, (err) => {
@@ -93,5 +99,6 @@ module.exports = {
 	updateUserInfo,
   updateEmail,
   updatePassword,
-  updateUserBlockStatus
+  updateUserBlockStatus,
+  getUsersByBlockStatus
 };

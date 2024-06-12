@@ -4,7 +4,7 @@
     <nav>
       <router-link to="/users" class="nav-link">Управление пользователями</router-link>
       <router-link to="/admin/requests" class="nav-link">Запросы доступа</router-link>
-      <router-link to="/admin/deleted-users" class="nav-link">Удаленные пользователи</router-link>
+      <router-link to="/admin/blocked-users" class="nav-link">Заблокированные пользователи</router-link>
       <button @click="logout" class="logout-button">Выйти</button>
     </nav>   
   </header>
