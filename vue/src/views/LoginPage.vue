@@ -30,6 +30,7 @@
 
 <script>
 import axios from 'axios';
+import { AUTH_ENDPOINTS } from '@/constants/api';
 import EmailPasswordForm from '@/components/EmailPasswordForm.vue';
 
 export default {
@@ -61,12 +62,12 @@ export default {
       try {
         let response;
         if(this.formMode === 'login') {
-          response = await axios.post('http://localhost:3000/auth/login', {
+          response = await axios.post(AUTH_ENDPOINTS.LOGIN, {
             email,
             password
           });
         } else {
-          response = await axios.post('http://localhost:3000/auth/register', {
+          response = await axios.post(AUTH_ENDPOINTS.REGISTER, {
             email,
             password,
             confirmPassword

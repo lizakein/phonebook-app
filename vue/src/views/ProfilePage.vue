@@ -41,10 +41,11 @@
   
 <script>
 import Header from '@/components/Header.vue';
+import AdminDashboard from '@/components/AdminDashboard.vue';
 import UserProfile from '../components/UserProfile.vue';
 import axios from 'axios';
+import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
-import AdminDashboard from '@/components/AdminDashboard.vue';
 
 export default {
   name: 'ProfilePage',
@@ -76,7 +77,7 @@ export default {
     async fetchUserData() {
       try {
         const userId = this.$route.params.id;
-        const response = await axios.get(`http://localhost:3000/user/${userId}`, {
+        const response = await axios.get(USER_ENDPOINTS.GET_USER_BY_ID(userId), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

@@ -41,6 +41,7 @@
   
 <script>
 import axios from 'axios';
+import { BASE_URL, USER_ENDPOINTS } from '@/constants/api';
 import { String } from 'core-js';
 import { jwtDecode } from 'jwt-decode';
 
@@ -78,7 +79,7 @@ export default {
   },
   methods: {
     getPhotoUrl(photoPath) {
-      return `http://localhost:3000/${photoPath.replace(/\\/g, '/')}`;
+      return `${BASE_URL}/${photoPath.replace(/\\/g, '/')}`;
     },
     formatDate(dateString) {
       const date = new Date(dateString);
@@ -206,7 +207,7 @@ export default {
         const newBlockStatus = !this.user.isBlocked;
         const token = localStorage.getItem('token');
 
-        const response = await axios.post(`http://localhost:3000/user/block-user/${userId}`, {isBlocked: newBlockStatus}, {
+        const response = await axios.post(USER_ENDPOINTS.UPDATE_BLOCK_STATUS(userId), {isBlocked: newBlockStatus}, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

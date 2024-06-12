@@ -36,6 +36,7 @@
 import UserDataForm from '@/components/UserDataForm.vue';
 import UserSettingsForm from '@/components/UserSettingsForm.vue';
 import axios from 'axios';
+import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
 
 export default {
@@ -78,7 +79,7 @@ export default {
       };
 
       try {       
-        const response = await axios.post('http://localhost:3000/user/user-info', userData, {
+        const response = await axios.post(USER_ENDPOINTS.UPDATE_INFO, userData, {
           headers: {
             'Authorization': `Bearer ${this.token}`,
             'Content-Type': 'application/json'
@@ -102,7 +103,7 @@ export default {
         const userId = this.$route.params.id;
 
         if (data.newEmail) {
-          emailResponse = await axios.post(`http://localhost:3000/user/update-email/${userId}`, { newEmail: data.newEmail }, {
+          emailResponse = await axios.post(USER_ENDPOINTS.UPDATE_EMAIL(userId), { newEmail: data.newEmail }, {
             headers: {
               'Authorization': `Bearer ${this.token}`,
               'Content-Type': 'application/json'
@@ -113,7 +114,7 @@ export default {
         if (data.newPassword) {
           const payload = this.isAdmin ? { newPassword: data.newPassword } : { oldPassword: data.oldPassword, newPassword: data.newPassword }
 
-          passwordResponse = await axios.post(`http://localhost:3000/user/update-password/${userId}`, payload, {
+          passwordResponse = await axios.post(USER_ENDPOINTS.UPDATE_PASSWORD(userId), payload, {
             headers: {
               'Authorization': `Bearer ${this.token}`,
               'Content-Type': 'application/json'
@@ -134,7 +135,7 @@ export default {
     async fetchUserData() {
       try {
         const userId = this.$route.params.id;
-        const response = await axios.get(`http://localhost:3000/user/${userId}`, {
+        const response = await axios.get(USER_ENDPOINTS.GET_USER_BY_ID(userId), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

@@ -23,6 +23,7 @@
 
 <script>
 import axios from 'axios';
+import { ADMIN_ENDPONTS } from '@/constants/api';
 import EmailPasswordForm from '@/components/EmailPasswordForm.vue';
 
 export default {
@@ -43,7 +44,7 @@ export default {
     },
     async handleFormSubmit({ email, password }) {
       try {
-        const response = await axios.post('http://localhost:3000/admin/login', {
+        const response = await axios.post(ADMIN_ENDPONTS.LOGIN, {
           email,
           password
         });

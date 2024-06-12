@@ -13,6 +13,7 @@
 <script>
 import UserDataForm from '@/components/UserDataForm.vue';
 import axios from 'axios';
+import { USER_ENDPOINTS } from '@/constants/api';
 
 export default {
   components: {
@@ -61,7 +62,7 @@ export default {
         if (this.user.photo) 
           formData.append('photo', this.user.photo); 
 
-        const response = await axios.post('http://localhost:3000/user/user-info', formData, {
+        const response = await axios.post(USER_ENDPOINTS.UPDATE_INFO, formData, {
           headers: {
             'Authorization': `Bearer ${this.token}`
           }

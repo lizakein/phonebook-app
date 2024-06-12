@@ -15,6 +15,7 @@ import Header from '@/components/Header.vue';
 import AdminDashboard from '@/components/AdminDashboard.vue'
 import UserCard from '@/components/UserCard.vue';
 import axios from 'axios';
+import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
 
 export default {
@@ -44,7 +45,7 @@ export default {
   methods: {
     async fetchUsers() {
       try {
-        const response = await axios.get('http://localhost:3000/user/block-list', {
+        const response = await axios.get(USER_ENDPOINTS.GET_USERS_BY_BLOCK_STATUS, {
           params: {
             blocked: this.blocked
           },
