@@ -26,12 +26,15 @@
     </div>
     <div class="info-section">
       <div class="full-name"> {{ user.fullName }}</div>
-      <div v-for="(field, index) in fields" :key="index" class="info-row">
-        <div class="info-label">{{ field.label }}</div>
-        <div class="info-value">
-          <span>{{ field.value }}</span>        
+      <div v-if="!user.isBlocked || isAdmin">
+        <div v-for="(field, index) in fields" :key="index" class="info-row">
+          <div class="info-label">{{ field.label }}</div>
+          <div class="info-value">
+            <span>{{ field.value }}</span>        
+          </div>
         </div>
-      </div>  
+      </div>    
+      <p v-else>Пользователь заблокирован</p>
     </div>
   </div>
 </template>
