@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import UserDataForm from '@/components/UserDataForm.vue';
+import UserDataForm from '@/components/forms/UserDataForm.vue';
 import axios from 'axios';
 import { USER_ENDPOINTS } from '@/constants/api';
 import errorHelper from '@/helpers/errorHelper';

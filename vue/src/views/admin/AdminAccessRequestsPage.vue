@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import AdminDashboard from '@/components/AdminDashboard.vue';
+import AdminDashboard from '@/components/admin/AdminDashboard.vue';
 import apiProvider from '@/services/apiProvider';
 import errorHelper from '@/helpers/errorHelper';
 

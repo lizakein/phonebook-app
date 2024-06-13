@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import UserDataForm from '@/components/UserDataForm.vue';
-import UserSettingsForm from '@/components/UserSettingsForm.vue';
+import UserDataForm from '@/components/forms/UserDataForm.vue';
+import UserSettingsForm from '@/components/forms/UserSettingsForm.vue';
 import axios from 'axios';
 import errorHelper from '@/helpers/errorHelper';
 import { USER_ENDPOINTS } from '@/constants/api';

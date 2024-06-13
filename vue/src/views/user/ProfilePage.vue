@@ -40,9 +40,9 @@
 </template>
   
 <script>
-import Header from '@/components/Header.vue';
-import AdminDashboard from '@/components/AdminDashboard.vue';
-import UserProfile from '../components/UserProfile.vue';
+import Header from '@/components/common/Header.vue';
+import AdminDashboard from '@/components/admin/AdminDashboard.vue';
+import UserProfile from '@/components/user/UserProfile.vue';
 import axios from 'axios';
 import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';

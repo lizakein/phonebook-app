@@ -25,7 +25,7 @@
 import axios from 'axios';
 import { ADMIN_ENDPONTS } from '@/constants/api';
 import errorHelper from '@/helpers/errorHelper';
-import EmailPasswordForm from '@/components/EmailPasswordForm.vue';
+import EmailPasswordForm from '@/components/forms/EmailPasswordForm.vue';
 
 export default {
   name: 'AdminLoginPage',

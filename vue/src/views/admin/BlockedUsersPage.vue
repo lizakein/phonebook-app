@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import UserListPage from '@/views/UserListPage.vue';
+import UserListPage from '@/views/user/UserListPage.vue';
 
 export default {
   name: 'BlockedUsersPage',
@@ -18,4 +18,4 @@ export default {
     };
   },
 };
-</script>
+</script>@/views/user/UserListPage.vue
