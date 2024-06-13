@@ -31,11 +31,11 @@ const login = (req, res) => {
     if (err) 
       return res.status(500).send({ message: 'Ошибка сервера' });
 
+    if (!row || !(await bcrypt.compare(password, row.password))) 
+      return res.status(401).send({ message: 'Неправильный логин и/или пароль' });
+
     if (row.isBlocked)
       return res.status(403).send({ message: 'Аккаунт заблокирован' });
-
-    if (!row || !(await bcrypt.compare(password, row.password))) 
-      return res.status(401).send({ message: 'Неправильный логин и/или пароль' });   
 
     const token = jwt.sign({ id: row.id, email }, JWT_SECRET, { expiresIn: '1h' });
     res.status(200).send({ id: row.id, token });
