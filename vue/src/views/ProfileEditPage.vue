@@ -36,6 +36,7 @@
 import UserDataForm from '@/components/UserDataForm.vue';
 import UserSettingsForm from '@/components/UserSettingsForm.vue';
 import axios from 'axios';
+import errorHelper from '@/helpers/errorHelper';
 import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
 
@@ -86,13 +87,10 @@ export default {
           }
         });
 
-        if (response.status === 200) {
-          this.user = { ...userData };
-          this.$router.push(`/profile/${this.user.id}`);
-        }
+        this.user = { ...userData };
+        this.$router.push(`/profile/${this.user.id}`);        
       } catch (error) {
-        console.log(error);
-        this.errorMessage = 'Ошибка сервера';
+        this.errorMessage = errorHelper.error('SERVER', 'SERVER_ERROR');
       }
     },
     async saveUserSettings(data) {
@@ -122,14 +120,12 @@ export default {
           });
         }
 
-        if (emailResponse.status === 200 && passwordResponse.status === 200)
-          this.$router.push(`/profile/${this.user.id}`);
+        this.$router.push(`/profile/${this.user.id}`);
       } catch (error) {
         if (error.response.data.message) 
           this.errorMessage = error.response.data.message;
         else 
-          this.errorMessage = 'Ошибка сервера';
-        console.log(error);
+          this.errorMessage = errorHelper.error('SERVER', 'SERVER_ERROR');
       }
     },
     async fetchUserData() {
@@ -164,7 +160,7 @@ export default {
           this.isAdmin = decodedToken.role === 'admin';
         } 
       } catch (error) {
-        console.error('Ошибка получения данных текущего пользователя из токена', error);
+        console.error(errorHelper.error('USER', 'TOKEN_USER_DATA_ERROR'), error);
       }
     }
   },

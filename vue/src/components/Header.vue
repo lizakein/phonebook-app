@@ -11,6 +11,7 @@
 
 <script>
 import { jwtDecode } from 'jwt-decode';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   name: 'Header',
@@ -30,7 +31,7 @@ export default {
           const decodedToken = jwtDecode(token);
           this.currentUserId = decodedToken.id;
         } catch (error) {
-          console.error('Ошибка декодирования токена', error);
+          console.error(errorHelper.error('USER', 'DECODE_TOKEN_ERROR'), error);
           this.$router.push('/login');
         }
       } else {

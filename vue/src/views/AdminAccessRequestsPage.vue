@@ -66,6 +66,7 @@
 <script>
 import AdminDashboard from '@/components/AdminDashboard.vue';
 import apiProvider from '@/services/apiProvider';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   name: 'AdminAccessRequests',
@@ -87,7 +88,7 @@ export default {
       try {
         this.accessRequests = await apiProvider.fetchAllAccessRequests({ status: this.selectedStatus, sortOrder: this.sortOrder });
       } catch (error) {
-        console.error('Ошибка получения запросов на доступ', error);
+        console.error(errorHelper.error('ACCESS', 'REQUEST_FETCH_ERROR'), error);
       }
     }, 
     async updateAccessRequestStatus(requestId, newStatus) {
@@ -95,7 +96,7 @@ export default {
         await apiProvider.updateAccessRequestStatus(requestId, newStatus)
         this.fetchAllAccessRequests();
       } catch (error) {
-        console.error('Ошибка обновления статуса запроса', error);
+        console.error(errorHelper.error('ACCESS', 'STATUS_UPDATE_ERROR'), error);
       }
     }
   }

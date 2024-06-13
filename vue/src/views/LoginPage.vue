@@ -31,6 +31,7 @@
 <script>
 import axios from 'axios';
 import { AUTH_ENDPOINTS } from '@/constants/api';
+import errorHelper from '@/helpers/errorHelper';
 import EmailPasswordForm from '@/components/EmailPasswordForm.vue';
 
 export default {
@@ -83,13 +84,13 @@ export default {
           this.$router.push({ path: '/user-info', query: { email }});       
       } catch (error) {
         if (error.response.status === 409) 
-          this.errorMessage = 'Этот email уже занят';
+          this.errorMessage = errorHelper.error('AUTH', 'EMAIL_ALREADY_TAKEN');
         else if (error.response.status === 401)
-          this.errorMessage = 'Неправильный логин и/или пароль';
+          this.errorMessage = errorHelper.error('AUTH', 'INVALID_LOGIN');
         else if (error.response.status === 403)
-          this.errorMessage = 'Ваш аккаунт заблокирован';
+          this.errorMessage = errorHelper.error('AUTH', 'ACCOUNT_BLOCKED');
         else
-          this.errorMessage = 'Ошибка сервера';
+          this.errorMessage = errorHelper.error('SERVER', 'SERVER_ERROR');
       }
     }
   }

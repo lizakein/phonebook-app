@@ -45,6 +45,7 @@ import { BASE_URL, USER_ENDPOINTS } from '@/constants/api';
 import { String } from 'core-js';
 import { jwtDecode } from 'jwt-decode';
 import apiProvider from '@/services/apiProvider';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   name: 'UserProfile',
@@ -110,7 +111,7 @@ export default {
           if (!Array.isArray(personalPhones)) 
             personalPhones = JSON.parse(personalPhones)
         } catch (error) {
-          console.error("Ошибка парсинга данных", error);
+          console.error(errorHelper.error('PARSING', 'DATA_PARSING_ERROR'), error);
           personalPhones = [];
         }
 
@@ -123,7 +124,7 @@ export default {
             if (error.response && error.response.status === 404)
               accessGranted = false;
             else
-              console.error('Ошибка при проверке существующего запроса', error)
+              console.error(errorHelper.error('ACCESS', 'CHECK_STATUS_ERROR'), error);
           }
         }
 
@@ -163,11 +164,9 @@ export default {
     async requestAccess() {
       try {
         await apiProvider.requestAccess(this.user.id);
-        alert('Запрос на доступ к личному номеру отправлен');
         this.requestExists = true;
       } catch(error) {
-        console.error('Ошибка запроса на доступ', error);
-        alert('Не удалось отправить запрос на доступ');
+        console.error(errorHelper.error('ACCESS', 'CHECK_REQUEST_ERROR'), error);
       }
     },
     async checkAccessRequest() {
@@ -179,7 +178,7 @@ export default {
           if (error.response && error.response.status === 404)
             this.requestExists = false;
           else {
-            console.error('Ошибка при проверке существующего запроса', error);
+            console.error(errorHelper.error('ACCESS', 'CHECK_REQUEST_ERROR'), error);
             this.requestExists = false;
           }
         }
@@ -203,7 +202,7 @@ export default {
         if (response.status === 200)
           this.user.isBlocked = newBlockStatus;
       } catch (error) {
-        console.error(error);
+        console.error(errorHelper.error('ACCESS', 'STATUS_UPDATE_ERROR'), error);
       }
     }
   },

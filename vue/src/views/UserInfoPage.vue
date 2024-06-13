@@ -14,6 +14,7 @@
 import UserDataForm from '@/components/UserDataForm.vue';
 import axios from 'axios';
 import { USER_ENDPOINTS } from '@/constants/api';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   components: {
@@ -67,10 +68,10 @@ export default {
             'Authorization': `Bearer ${this.token}`
           }
         });
-        console.log(response);
-        if (response.status === 200) this.$router.push(`/profile/${response.data.id}`);       
+        
+        this.$router.push(`/profile/${response.data.id}`);       
       } catch (error) {
-        console.log('Ошибка сервера', error);
+        console.log(errorHelper.error('SERVER', 'SERVER_ERROR'), error);
       }
     }
   },

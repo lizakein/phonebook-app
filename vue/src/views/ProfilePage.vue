@@ -47,6 +47,7 @@ import axios from 'axios';
 import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
 import apiProvider from '@/services/apiProvider';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   name: 'ProfilePage',
@@ -90,7 +91,7 @@ export default {
           if (!this.isAdmin) this.fetchAccessRequests(this.userId);
         }
       } catch(error) {
-        console.error('Ошибка получения пользовательских данных', error);
+        console.error(errorHelper.error('USER', 'USER_DATA_FETCH_ERROR'), error);
       }
     },
     fetchCurrentUser() {
@@ -103,14 +104,14 @@ export default {
           this.currentHeaderComponent = decodedToken.role === 'admin' ? 'AdminDashboard' : 'Header';
         } 
       } catch (error) {
-        console.error('Ошибка получения данных текущего пользователя из токена', error);
+        console.error(errorHelper.error('USER', 'TOKEN_USER_DATA_ERROR'), error);
       }
     },
     async fetchAccessRequests(userId) {
       try {
         this.requests = await apiProvider.fetchAccessRequests(userId, 'pending');
       } catch (error) {
-        console.error('Ошибка получения запросов на доступ', error);
+        console.error(errorHelper.error('ACCESS', 'REQUEST_FETCH_ERROR'), error);
       }
     },
     checkHiddenPhone() {
@@ -121,7 +122,7 @@ export default {
 
         this.hasHiddenPhone = personalPhones.some(phone => phone.hide);
       } catch (error) {
-        console.error('Ошибка проверки скрытых номеров', error);
+        console.error(errorHelper.error('ACCESS', 'HIDDEN_PHONE_CHECK_ERROR'), error);
       }
     },
     async acceptRequest(request) {
@@ -129,7 +130,7 @@ export default {
         await apiProvider.updateAccessRequestStatus(request.id, 'accepted');
         this.fetchAccessRequests(this.user.id);
       } catch (error) {
-        console.error('Ошибка при принятии запроса', error);
+        console.error(errorHelper.error('ACCESS', 'REQUEST_ACCEPT_ERROR'), error);
       }
     },
     async rejectRequest(request) {
@@ -137,7 +138,7 @@ export default {
         await apiProvider.updateAccessRequestStatus(request.id, 'rejected');
         this.fetchAccessRequests(this.user.id);
       } catch (error) {
-        console.error('Ошибка при отклонении запроса', error);
+        console.error(errorHelper.error('ACCESS', 'REQUEST_REJECT_ERROR'), error);
       }
     }  
   },

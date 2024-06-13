@@ -17,6 +17,7 @@ import UserCard from '@/components/UserCard.vue';
 import axios from 'axios';
 import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   name: 'UserListPage',
@@ -56,7 +57,7 @@ export default {
         this.users = response.data;
         if (this.users.length === 0) this.isEmptyList = true;
       } catch (error) {
-        console.error('Ошибка получения списка пользователей', error);
+        console.error(errorHelper.error('USER', 'GET_USER_LIST_ERROR'), error);
       }
     },
     fetchCurrentUser() {
@@ -66,7 +67,7 @@ export default {
           const decodedToken = jwtDecode(token);
           this.currentHeaderComponent = decodedToken.role === 'admin' ? 'AdminDashboard' : 'Header';
         } catch (error) {
-          console.error('Ошибка декодирования токена', error);
+          console.error(errorHelper.error('USER', 'DECODE_TOKEN_ERROR'), error);
           this.$router.push('/login');
         }
       } else {

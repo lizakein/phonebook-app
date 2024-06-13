@@ -23,6 +23,8 @@
 </template>
   
 <script>
+import errorHelper from '@/helpers/errorHelper';
+
 export default {
   name: 'EmailPasswordForm',
   props: {
@@ -44,16 +46,16 @@ export default {
   },
   watch: {
     email(value) {
-      this.emailError = this.validateEmail(value) ? '' : 'Некорректный email';
+      this.emailError = this.validateEmail(value) ? '' : errorHelper.error('VALIDATION', 'INVALID_EMAIL_ERROR');
     },
     password(value) {
       if (this.formMode === 'register') 
-        this.passwordError = this.validatePassword(value) ? '' : 'Пароль должен быть не менее 8 символов, содержать буквы, цифры и спецсимволы';
+        this.passwordError = this.validatePassword(value) ? '' : errorHelper.error('VALIDATION', 'INVALID_PASSWORD_ERROR');
       else 
         this.passwordError = '';
     },
     confirmPassword(value) {
-      this.confirmPasswordError = value === this.password ? '' : 'Пароли не совпадают';
+      this.confirmPasswordError = value === this.password ? '' : errorHelper.error('VALIDATION', 'INVALID_EMAIL_ERROR');
     }
   },
   computed: {
@@ -72,7 +74,7 @@ export default {
           confirmPassword: this.confirmPassword
         });
       } else {
-        this.errorMessage = 'Введены некорректные данные';
+        this.errorMessage = errorHelper.error('VALIDATION', 'INVALID_DATA_ERROR');
       }
     },
     validateForm() {

@@ -24,6 +24,7 @@
 <script>
 import axios from 'axios';
 import { ADMIN_ENDPONTS } from '@/constants/api';
+import errorHelper from '@/helpers/errorHelper';
 import EmailPasswordForm from '@/components/EmailPasswordForm.vue';
 
 export default {
@@ -55,9 +56,9 @@ export default {
         this.$router.push({ path: '/users'});    
       } catch (error) {
         if (error.response.status === 401)
-          this.errorMessage = 'Неправильный логин и/или пароль';
+          this.errorMessage = errorHelper.error('AUTH', 'INVALID_LOGIN');
         else
-          this.errorMessage = 'Ошибка сервера';
+          this.errorMessage = errorHelper.error('SERVER', 'SERVER_ERROR');
       }
     }
   }
