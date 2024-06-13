@@ -192,15 +192,14 @@ export default {
         const newBlockStatus = !this.user.isBlocked;
         const token = localStorage.getItem('token');
 
-        const response = await axios.post(USER_ENDPOINTS.UPDATE_BLOCK_STATUS(userId), {isBlocked: newBlockStatus}, {
+        await axios.put(USER_ENDPOINTS.UPDATE_BLOCK_STATUS(userId), {isBlocked: newBlockStatus}, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
         
-        if (response.status === 200)
-          this.user.isBlocked = newBlockStatus;
+        this.user.isBlocked = newBlockStatus;
       } catch (error) {
         console.error(errorHelper.error('ACCESS', 'STATUS_UPDATE_ERROR'), error);
       }

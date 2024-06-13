@@ -18,4 +18,4 @@ export default {
     };
   },
 };
-</script>@/views/user/UserListPage.vue
+</script>

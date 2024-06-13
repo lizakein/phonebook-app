@@ -80,7 +80,7 @@ export default {
       };
 
       try {       
-        const response = await axios.post(USER_ENDPOINTS.UPDATE_INFO, userData, {
+        await axios.put(USER_ENDPOINTS.UPDATE_INFO, userData, {
           headers: {
             'Authorization': `Bearer ${this.token}`,
             'Content-Type': 'application/json'
@@ -101,7 +101,7 @@ export default {
         const userId = this.$route.params.id;
 
         if (data.newEmail) {
-          emailResponse = await axios.post(USER_ENDPOINTS.UPDATE_EMAIL(userId), { newEmail: data.newEmail }, {
+          emailResponse = await axios.put(USER_ENDPOINTS.UPDATE_EMAIL(userId), { newEmail: data.newEmail }, {
             headers: {
               'Authorization': `Bearer ${this.token}`,
               'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ export default {
         if (data.newPassword) {
           const payload = this.isAdmin ? { newPassword: data.newPassword } : { oldPassword: data.oldPassword, newPassword: data.newPassword }
 
-          passwordResponse = await axios.post(USER_ENDPOINTS.UPDATE_PASSWORD(userId), payload, {
+          passwordResponse = await axios.put(USER_ENDPOINTS.UPDATE_PASSWORD(userId), payload, {
             headers: {
               'Authorization': `Bearer ${this.token}`,
               'Content-Type': 'application/json'

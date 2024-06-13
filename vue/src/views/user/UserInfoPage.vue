@@ -63,7 +63,7 @@ export default {
         if (this.user.photo) 
           formData.append('photo', this.user.photo); 
 
-        const response = await axios.post(USER_ENDPOINTS.UPDATE_INFO, formData, {
+        const response = await axios.put(USER_ENDPOINTS.UPDATE_INFO, formData, {
           headers: {
             'Authorization': `Bearer ${this.token}`
           }
