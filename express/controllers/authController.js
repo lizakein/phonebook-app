@@ -14,13 +14,8 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    userModel.createUser(email, hashedPassword, (err, userId) => {
-      if (err) 
-        return res.status(500).send({ message: 'Ошибка сервера' });
-  
-      const token = jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '1h' });
-      res.status(201).send({ id: userId, token });
-    });
+    const token = jwt.sign({ email, hashedPassword }, JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).send({ token });
   });
 };
 
