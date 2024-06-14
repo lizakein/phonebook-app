@@ -55,7 +55,7 @@ export default {
         this.passwordError = '';
     },
     confirmPassword(value) {
-      this.confirmPasswordError = value === this.password ? '' : errorHelper.error('VALIDATION', 'INVALID_EMAIL_ERROR');
+      this.confirmPasswordError = value === this.password ? '' : errorHelper.error('VALIDATION', 'PASSWORDS_NOT_MATCH');
     }
   },
   computed: {

@@ -146,7 +146,7 @@ export default {
     async handleSave() {
       try {
         if (!this.validateForm()) {
-          this.errorMessage = errorHelper.error('DATA', 'INCORRECT_DATA_ERROR');
+          this.errorMessage = errorHelper.error('VALIDATION', 'INVALID_DATA_ERROR');
           return;
         }
 
