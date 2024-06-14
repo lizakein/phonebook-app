@@ -91,7 +91,11 @@ export default {
           if (!this.isAdmin) this.fetchAccessRequests(this.userId);
         }
       } catch(error) {
-        console.error(errorHelper.error('USER', 'USER_DATA_FETCH_ERROR'), error);
+        if (error.response.status === 404) {
+          this.user = null;
+          this.$router.replace('/not-found');
+        } else
+          console.error(errorHelper.error('USER', 'USER_DATA_FETCH_ERROR'), error);
       }
     },
     fetchCurrentUser() {
