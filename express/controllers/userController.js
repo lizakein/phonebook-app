@@ -1,5 +1,7 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/config.js');
 
 const updateEmail = (req, res) => {
   const { newEmail } = req.body;
@@ -54,6 +56,7 @@ const updatePassword = async (req, res) => {
 
 const updateUserInfo = (req, res) => {
   const {
+    email,
     fullName,
     birthdate,
     hideYear, 
@@ -66,13 +69,9 @@ const updateUserInfo = (req, res) => {
   } = req.body;
   const photo = req.file ? req.file.path : 'uploads/default-photo.jpg';
 
-  const { email, hashedPassword } = decoded;
-
   const hideYearBool = hideYear === 'true';
 
   const userData = {
-    email,
-    password: hashedPassword,
     fullName,
     birthdate,
     hideYear: hideYearBool ? 1 : 0, 
@@ -85,10 +84,10 @@ const updateUserInfo = (req, res) => {
     photo
   };
 
-  userModel.updateUserInfo(userData, (err, userId) => {
+  userModel.updateUserInfo(email, userData, (err, userId) => {
     if (err)
       return res.status(500).send({ message: 'Ошибка сервера'});
-    res.status(200).send({ id: userId });
+    res.status(200).send({ id: userId.id });
   });
 };
 

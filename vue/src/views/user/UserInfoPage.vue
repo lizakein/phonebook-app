@@ -50,6 +50,7 @@ export default {
           .map(phone => ({ number: phone.number, hide: phone.hide }));
 
         const formData = new FormData();
+        formData.append('email', this.$route.query.email);
         formData.append('fullName', this.user.fullName);
         formData.append('birthdate', this.user.birthdate);
         formData.append('hideYear', this.user.hideYear);

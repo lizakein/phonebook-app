@@ -48,10 +48,8 @@ const updatePassword = (id, newPassword, callback) => {
   stmt.finalize();
 };
 
-const updateUserInfo = (userData, callback) => {
+const updateUserInfo = (email, userData, callback) => {
   const {
-    email,
-    password,
     fullName,
     birthdate,
     hideYear, 
@@ -64,14 +62,25 @@ const updateUserInfo = (userData, callback) => {
 		photo
   } = userData;
 
-  const stmt = db.prepare('INSERT INTO users (email, password, fullName, birthdate, hideYear, workPhone, personalPhones, department, position, office, about, photo, isBlocked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-  stmt.run(
-    email, password, fullName, birthdate, hideYear, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, 0,
-    function(err) {
-      callback(err, this.lastID);
-    }
-  );
-  stmt.finalize();
+  db.get('SELECT id FROM users WHERE email = ?', [email], (err, row) => {
+    if (err || !row) 
+      return callback(err || new Error('Пользователь не найден'));
+
+    const userId = row.id;
+
+    const stmt = db.prepare(`
+      UPDATE users
+      SET fullName = ?, birthdate = ?, hideYear = ?, workPhone = ?, personalPhones = ?, department = ?, position = ?, office = ?, about = ?, photo = ?
+      WHERE email = ?
+    `);
+    stmt.run(
+      fullName, birthdate, hideYear, workPhone, JSON.stringify(personalPhones), department, position, office, about, photo, email,
+      function(err) {
+        callback(err, { id: userId });
+      }
+    );
+    stmt.finalize();
+  });
 };
 
 const updateUserBlockStatus = (id, isBlocked, callback) => {
