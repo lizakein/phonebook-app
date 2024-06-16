@@ -30,7 +30,9 @@
 
 <script>
 import axios from 'axios';
-import EmailPasswordForm from '@/components/EmailPasswordForm.vue';
+import { AUTH_ENDPOINTS } from '@/constants/api';
+import errorHelper from '@/helpers/errorHelper';
+import EmailPasswordForm from '@/components/forms/EmailPasswordForm.vue';
 
 export default {
   name: 'LoginPage',
@@ -61,12 +63,12 @@ export default {
       try {
         let response;
         if(this.formMode === 'login') {
-          response = await axios.post('http://localhost:3000/auth/login', {
+          response = await axios.post(AUTH_ENDPOINTS.LOGIN, {
             email,
             password
           });
         } else {
-          response = await axios.post('http://localhost:3000/auth/register', {
+          response = await axios.post(AUTH_ENDPOINTS.REGISTER, {
             email,
             password,
             confirmPassword
@@ -82,11 +84,13 @@ export default {
           this.$router.push({ path: '/user-info', query: { email }});       
       } catch (error) {
         if (error.response.status === 409) 
-          this.errorMessage = 'Этот email уже занят';
+          this.errorMessage = errorHelper.error('AUTH', 'EMAIL_ALREADY_TAKEN');
         else if (error.response.status === 401)
-          this.errorMessage = 'Неправильный логин и/или пароль';
+          this.errorMessage = errorHelper.error('AUTH', 'INVALID_LOGIN');
+        else if (error.response.status === 403)
+          this.errorMessage = errorHelper.error('AUTH', 'ACCOUNT_BLOCKED');
         else
-          this.errorMessage = 'Ошибка сервера';
+          this.errorMessage = errorHelper.error('SERVER', 'SERVER_ERROR');
       }
     }
   }

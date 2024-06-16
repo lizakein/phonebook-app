@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { BASE_URL } from '@/constants/api';
 export default {
   name: 'UserCard',
   props: {
@@ -18,7 +19,7 @@ export default {
   },
   methods: {
     getPhotoUrl(photoPath) {
-      return `http://localhost:3000/${photoPath.replace(/\\/g, '/')}`;
+      return `${BASE_URL}/${photoPath.replace(/\\/g, '/')}`;
     }
   }
 };

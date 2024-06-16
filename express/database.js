@@ -14,6 +14,13 @@ const db_requests = new sqlite3.Database('access_requests.db', (err) => {
 		console.log('Подключение к базе данных запросов установлено');	
 });
 
+const db_admins = new sqlite3.Database('admins.db', (err) => {
+	if (err) 
+		console.error('Ошибка подключения к базе данных админов:', err);
+	else 
+		console.log('Подключение к базе данных админов установлено');	
+});
+
 db.serialize(() => {
 	db.run(`
 		CREATE TABLE IF NOT EXISTS users (
@@ -29,7 +36,8 @@ db.serialize(() => {
 			position TEXT,
 			office TEXT,
 			about TEXT,
-			photo TEXT
+			photo TEXT,
+			isBlocked INTEGER NOT NULL
 		)
 	`);
 });
@@ -40,12 +48,24 @@ db_requests.serialize(() => {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			requester_id INTEGER,
 			owner_id INTEGER,
-			status TEXT DEFAULT 'pending'
+			status TEXT DEFAULT 'pending',
+			created_at TEXT DEFAULT CURRENT_TIMESTAMP
+		)
+	`);
+});
+
+db_admins.serialize(() => {
+	db_admins.run(`
+		CREATE TABLE IF NOT EXISTS admins (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			email TEXT UNIQUE NOT NULL,
+			password TEXT NOT NULL
 		)
 	`);
 });
 
 module.exports = {
 	db,
-	db_requests
+	db_requests,
+	db_admins
 };

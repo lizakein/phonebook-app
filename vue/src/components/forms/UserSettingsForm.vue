@@ -22,6 +22,8 @@
 </template>
   
 <script>
+import errorHelper from '@/helpers/errorHelper';
+
 export default {
   name: 'UserSettingsForm',
   data() {
@@ -36,10 +38,10 @@ export default {
   },
   watch: {
     newEmail(value) {
-      this.emailError = this.validateEmail(value) ? '' : (value ? 'Некорректный email' : '');
+      this.emailError = this.validateEmail(value) ? '' : (value ? errorHelper.error('VALIDATION', 'INVALID_EMAIL_ERROR') : '');
     },
     newPassword(value) {
-      this.newPasswordError = this.validatePassword(value) ? '' : (value ? 'Пароль должен быть не менее 8 символов, содержать буквы, цифры и спецсимволы' : '');
+      this.newPasswordError = this.validatePassword(value) ? '' : (value ? errorHelper.error('VALIDATION', 'INVALID_PASSWORD_ERROR') : '');
     }
   },
   methods: {

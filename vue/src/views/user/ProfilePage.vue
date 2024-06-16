@@ -1,14 +1,15 @@
 <template>
   <div>
-    <Header />
+    <component :is="currentHeaderComponent" />
     <div class="page-container">
     <div class="container">
       <UserProfile 
         :userData="user" 
-        :isOwner="user?.isOwner"
+        :isOwner="isOwner"
+        :isAdmin="isAdmin"
         v-if="user"
       />
-      <div v-if="user && user?.isOwner" class="requests-section">
+      <div v-if="user && isOwner" class="requests-section">
         <h2>Запросы на просмотр личного номера</h2>
         <div v-if="requests.length === 0">
           <p v-if="!hasHiddenPhone">Ваш номер могут видеть все</p>
@@ -39,24 +40,31 @@
 </template>
   
 <script>
-import Header from '@/components/Header.vue';
-import UserProfile from '../components/UserProfile.vue';
+import Header from '@/components/common/Header.vue';
+import AdminDashboard from '@/components/admin/AdminDashboard.vue';
+import UserProfile from '@/components/user/UserProfile.vue';
 import axios from 'axios';
+import { USER_ENDPOINTS } from '@/constants/api';
 import { jwtDecode } from 'jwt-decode';
+import apiProvider from '@/services/apiProvider';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   name: 'ProfilePage',
   components: {
     UserProfile,
-    Header
+    Header,
+    AdminDashboard
   },
   data() {
     return {
       user: null,
       currentUserId: null,
       isOwner: false,
+      isAdmin: false,
       requests: [],
-      hasHiddenPhone: false
+      hasHiddenPhone: false,
+      currentHeaderComponent: 'Header'
     };
   },
   watch: {
@@ -71,7 +79,7 @@ export default {
     async fetchUserData() {
       try {
         const userId = this.$route.params.id;
-        const response = await axios.get(`http://localhost:3000/user/${userId}`, {
+        const response = await axios.get(USER_ENDPOINTS.GET_USER_BY_ID(userId), {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -80,10 +88,14 @@ export default {
         this.isOwner = this.user.id === this.currentUserId;
         if (this.isOwner) {
           this.checkHiddenPhone();
-          this.fetchAccessRequests();
+          if (!this.isAdmin) this.fetchAccessRequests(this.userId);
         }
       } catch(error) {
-        console.error('Ошибка получения пользовательских данных', error);
+        if (error.response.status === 404) {
+          this.user = null;
+          this.$router.replace('/not-found');
+        } else
+          console.error(errorHelper.error('USER', 'USER_DATA_FETCH_ERROR'), error);
       }
     },
     fetchCurrentUser() {
@@ -92,21 +104,18 @@ export default {
         if (token) {
           const decodedToken = jwtDecode(token);
           this.currentUserId = decodedToken.id;
+          this.isAdmin = decodedToken.role === 'admin';
+          this.currentHeaderComponent = decodedToken.role === 'admin' ? 'AdminDashboard' : 'Header';
         } 
       } catch (error) {
-        console.error('Ошибка получения данных текущего пользователя из токена', error);
+        console.error(errorHelper.error('USER', 'TOKEN_USER_DATA_ERROR'), error);
       }
     },
-    async fetchAccessRequests() {
+    async fetchAccessRequests(userId) {
       try {
-        const response = await axios.get(`http://localhost:3000/access/access-requests/${this.user.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        this.requests = response.data.requests.filter(request => request.status === 'pending');
+        this.requests = await apiProvider.fetchAccessRequests(userId, 'pending');
       } catch (error) {
-        console.error('Ошибка получения запросов на доступ', error);
+        console.error(errorHelper.error('ACCESS', 'REQUEST_FETCH_ERROR'), error);
       }
     },
     checkHiddenPhone() {
@@ -117,33 +126,23 @@ export default {
 
         this.hasHiddenPhone = personalPhones.some(phone => phone.hide);
       } catch (error) {
-        console.error('Ошибка проверки скрытых номеров', error);
+        console.error(errorHelper.error('ACCESS', 'HIDDEN_PHONE_CHECK_ERROR'), error);
       }
     },
     async acceptRequest(request) {
       try {
-        await axios.put(`http://localhost:3000/access/access-request/${request.id}`, { status: 'accepted' }, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        this.fetchAccessRequests();
+        await apiProvider.updateAccessRequestStatus(request.id, 'accepted');
+        this.fetchAccessRequests(this.user.id);
       } catch (error) {
-        console.error('Ошибка при принятии запроса', error);
+        console.error(errorHelper.error('ACCESS', 'REQUEST_ACCEPT_ERROR'), error);
       }
     },
     async rejectRequest(request) {
       try {
-        await axios.put(`http://localhost:3000/access/access-request/${request.id}`, { status: 'rejected' }, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        this.fetchAccessRequests();
+        await apiProvider.updateAccessRequestStatus(request.id, 'rejected');
+        this.fetchAccessRequests(this.user.id);
       } catch (error) {
-        console.error('Ошибка при отклонении запроса', error);
+        console.error(errorHelper.error('ACCESS', 'REQUEST_REJECT_ERROR'), error);
       }
     }  
   },

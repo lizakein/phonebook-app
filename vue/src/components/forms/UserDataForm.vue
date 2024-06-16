@@ -75,6 +75,8 @@
 </template>
 
 <script>
+import errorHelper from '@/helpers/errorHelper';
+
 export default {
   name: 'UserDataForm',
   props: {
@@ -116,19 +118,19 @@ export default {
       deep: true
     },
     'user.fullName': function (value) {
-      this.fullNameError = this.validateText(value) ? '' : (value ? 'Некорректное ФИО' : 'Поле обязательное');
+      this.fullNameError = this.validateText(value) ? '' : (value ? errorHelper.error('VALIDATION', 'INVALID_NAME_ERROR') : errorHelper.error('VALIDATION', 'REQUIRED_FIELD_ERROR'));
     },
     'user.birthdate': function (value) {
-      this.birthdateError = this.validateBirthdate(value) ? '' : (value ? 'Некорректная дата рождения' : 'Поле обязательное');
+      this.birthdateError = this.validateBirthdate(value) ? '' : (value ? errorHelper.error('VALIDATION', 'INVALID_BIRTHDATE_ERROR') : errorHelper.error('VALIDATION', 'REQUIRED_FIELD_ERROR'));
     },
     'user.workPhone': function (value) {
-      this.workPhoneError = this.validatePhone(value) ? '' : (value ? 'Некорректный номер телефона' : 'Поле обязательное');
+      this.workPhoneError = this.validatePhone(value) ? '' : (value ? errorHelper.error('VALIDATION', 'INVALID_PHONE_ERROR') : errorHelper.error('VALIDATION', 'REQUIRED_FIELD_ERROR'));
     },
     'user.department': function (value) {
-      this.departmentError = this.validateText(value) ? '' : (value ? 'Некорректный отдел' : '');
+      this.departmentError = this.validateText(value) ? '' : (value ? errorHelper.error('VALIDATION', 'INVALID_DEPARTMENT_ERROR') : '');
     },
     'user.position': function (value) {
-      this.positionError = this.validateText(value) ? '' : (value ? 'Некорректная должность' : '');
+      this.positionError = this.validateText(value) ? '' : (value ? errorHelper.error('VALIDATION', 'INVALID_POSITION_ERROR') : '');
     }
   },
   methods: {
@@ -144,7 +146,7 @@ export default {
     async handleSave() {
       try {
         if (!this.validateForm()) {
-          this.errorMessage = 'Введены некорректные данные';
+          this.errorMessage = errorHelper.error('VALIDATION', 'INVALID_DATA_ERROR');
           return;
         }
 
@@ -153,7 +155,7 @@ export default {
         this.$emit('save', { ...this.user });
 
       } catch (error) {
-        this.errorMessage = 'Ошибка сервера';
+        this.errorMessage = errorHelper.error('SERVER', 'SERVER_ERROR');
         console.error(error);
       }
     },
@@ -184,7 +186,7 @@ export default {
     },
     validatePersonalPhone(index) {
       const phone = this.user.personalPhones[index].number;
-      this.user.personalPhones[index].error = this.validatePhone(phone) || phone === '' ? '' : 'Некорректный номер телефона';
+      this.user.personalPhones[index].error = this.validatePhone(phone) || phone === '' ? '' : errorHelper.error('VALIDATION', 'INVALID_PHONE_ERROR');
     },
     validateAllPersonalPhones() {
       return this.user.personalPhones.every(phone => this.validatePhone(phone.number) || phone.number === '');

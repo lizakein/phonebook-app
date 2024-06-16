@@ -11,8 +11,10 @@
 </template>
 
 <script>
-import UserDataForm from '@/components/UserDataForm.vue';
+import UserDataForm from '@/components/forms/UserDataForm.vue';
 import axios from 'axios';
+import { USER_ENDPOINTS } from '@/constants/api';
+import errorHelper from '@/helpers/errorHelper';
 
 export default {
   components: {
@@ -61,15 +63,15 @@ export default {
         if (this.user.photo) 
           formData.append('photo', this.user.photo); 
 
-        const response = await axios.post('http://localhost:3000/user/user-info', formData, {
+        const response = await axios.put(USER_ENDPOINTS.UPDATE_INFO, formData, {
           headers: {
             'Authorization': `Bearer ${this.token}`
           }
         });
-        console.log(response);
-        if (response.status === 200) this.$router.push(`/profile/${response.data.id}`);       
+        
+        this.$router.push(`/profile/${response.data.id}`);       
       } catch (error) {
-        console.log('Ошибка сервера', error);
+        console.log(errorHelper.error('SERVER', 'SERVER_ERROR'), error);
       }
     }
   },

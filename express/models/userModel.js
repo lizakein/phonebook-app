@@ -1,8 +1,8 @@
 const { db } = require('../database');
 
 const createUser = (email, hashedPassword, callback) => {
-	const stmt = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
-	stmt.run(email, hashedPassword, function(err) {
+	const stmt = db.prepare('INSERT INTO users (email, password, isBlocked) VALUES (?, ?, ?)');
+	stmt.run(email, hashedPassword, 0, function(err) {
 		callback(err, this.lastID);
 	});
 	stmt.finalize();
@@ -22,6 +22,12 @@ const getUserById = (id, callback) => {
 
 const getAllUsers = (callback) => {
   db.all('SELECT * FROM users', (err, rows) => {
+    callback(err, rows);
+  });
+};
+
+const getUsersByBlockStatus = (blocked, callback) => {
+  db.all('SELECT * FROM users WHERE isBlocked = ?', [blocked], (err, rows) => {
     callback(err, rows);
   });
 };
@@ -77,6 +83,14 @@ const updateUserInfo = (email, userData, callback) => {
   });
 };
 
+const updateUserBlockStatus = (id, isBlocked, callback) => {
+  const stmt = db.prepare('UPDATE users SET isBlocked = ? WHERE id = ?');
+  stmt.run(isBlocked, id, (err) => {
+    callback(err);
+  });
+  stmt.finalize();
+};
+
 module.exports = {
 	createUser,
 	getUserByEmail,
@@ -84,5 +98,7 @@ module.exports = {
   getAllUsers,
 	updateUserInfo,
   updateEmail,
-  updatePassword
+  updatePassword,
+  updateUserBlockStatus,
+  getUsersByBlockStatus
 };
